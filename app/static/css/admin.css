@@ -1,0 +1,292 @@
+/* ═══════════════════════════════════════════
+   admin.css — Flask blog admin supplement
+   Depends on book.css being loaded first.
+   ═══════════════════════════════════════════ */
+
+/* ── Flash messages ── */
+.admin-flashes {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+}
+.admin-flashes li {
+  padding: 0.625rem 1rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 0.5rem;
+  font-size: var(--font-size-smaller);
+  border-inline-start: 3px solid transparent;
+}
+.admin-flashes .flash-success {
+  background: var(--color-accent-tip-tint);
+  border-color: var(--color-accent-tip);
+  color: var(--color-accent-tip);
+}
+.admin-flashes .flash-error,
+.admin-flashes .flash-danger {
+  background: var(--color-accent-caution-tint);
+  border-color: var(--color-accent-caution);
+  color: var(--color-accent-caution);
+}
+.admin-flashes .flash-warning {
+  background: var(--color-accent-warning-tint);
+  border-color: var(--color-accent-warning);
+  color: var(--color-accent-warning);
+}
+.admin-flashes .flash-info,
+.admin-flashes .flash-message {
+  background: var(--color-accent-note-tint);
+  border-color: var(--color-accent-note);
+  color: var(--color-accent-note);
+}
+
+/* ── Toolbar: search + filter + actions row ── */
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+.admin-toolbar .admin-toolbar-end {
+  margin-inline-start: auto;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ── Inputs, selects, textareas ── */
+.admin-input,
+.admin-select,
+.admin-textarea {
+  padding: 0.4rem 0.625rem;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--border-radius);
+  background: var(--gray-100);
+  color: var(--body-font-color);
+  font-size: var(--font-size-smaller);
+  line-height: 1.4;
+  transition: border-color 0.15s ease;
+}
+.admin-input:focus,
+.admin-select:focus,
+.admin-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent-default);
+}
+.admin-input { min-width: 14rem; }
+.admin-select { cursor: pointer; }
+.admin-textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 5rem;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  padding: 0.4rem 0.875rem;
+  border-radius: var(--border-radius);
+  border: 1px solid transparent;
+  font-size: var(--font-size-smaller);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.1s ease, background 0.1s ease;
+  white-space: nowrap;
+}
+.btn:hover { opacity: 0.8; text-decoration: none; }
+.btn:active { opacity: 0.6; }
+
+.btn-primary {
+  background: var(--color-accent-default);
+  color: #fff;
+  border-color: var(--color-accent-default);
+}
+.btn-secondary {
+  background: var(--gray-100);
+  color: var(--body-font-color);
+  border-color: var(--gray-200);
+}
+.btn-danger {
+  background: var(--color-accent-caution-tint);
+  color: var(--color-accent-caution);
+  border-color: var(--color-accent-caution);
+}
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: var(--font-size-smallest);
+}
+.btn-icon {
+  padding: 0.3rem 0.4rem;
+  line-height: 0;
+}
+
+/* ── Admin table ── */
+.admin-table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: collapse;
+  font-size: var(--font-size-smaller);
+  margin-bottom: 1.5rem;
+}
+.admin-table thead {
+  background: var(--gray-100);
+}
+.admin-table th,
+.admin-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--gray-200);
+  text-align: start;
+  vertical-align: middle;
+}
+.admin-table th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.admin-table tbody tr:hover {
+  background: var(--body-background-tint, rgba(0,0,0,.02));
+}
+.admin-table .col-actions {
+  width: 1%;
+  white-space: nowrap;
+}
+.admin-table .col-status { width: 1%; white-space: nowrap; }
+.admin-table .col-date   { width: 7rem; white-space: nowrap; }
+
+/* Status badge */
+.badge {
+  display: inline-block;
+  padding: 0.1em 0.5em;
+  border-radius: 9999px;
+  font-size: var(--font-size-smallest);
+  font-weight: 500;
+}
+.badge-published { background: var(--color-accent-tip-tint);  color: var(--color-accent-tip); }
+.badge-draft     { background: var(--gray-200);                color: var(--gray-500); }
+.badge-featured  { background: var(--color-accent-note-tint);  color: var(--color-accent-note); }
+
+/* ── Form layout ── */
+.admin-form { max-width: 60rem; }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+}
+.form-group label {
+  font-size: var(--font-size-smaller);
+  font-weight: 500;
+}
+.form-group .form-hint {
+  font-size: var(--font-size-smallest);
+  opacity: 0.6;
+}
+.form-group .form-error {
+  font-size: var(--font-size-smallest);
+  color: var(--color-accent-caution);
+}
+
+/* Two-column layout for short fields */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.form-row .form-group { flex: 1 1 14rem; }
+
+/* ── Toggle switch (published / featured) ── */
+.toggle-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--font-size-smaller);
+}
+.toggle-switch input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 2.25rem;
+  height: 1.25rem;
+  background: var(--gray-200);
+  border-radius: 9999px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+.toggle-switch input[type="checkbox"]::after {
+  content: '';
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+.toggle-switch input[type="checkbox"]:checked {
+  background: var(--color-accent-default);
+}
+.toggle-switch input[type="checkbox"]:checked::after {
+  transform: translateX(1rem);
+}
+
+/* ── CodeMirror editor container ── */
+.editor-container {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+.editor-container .CodeMirror {
+  height: 28rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+}
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.625rem;
+  background: var(--gray-100);
+  border-bottom: 1px solid var(--gray-200);
+  font-size: var(--font-size-smallest);
+}
+.editor-toolbar span { opacity: 0.6; }
+
+/* ── Section divider in form ── */
+.admin-section {
+  margin: 1.5rem 0 0.75rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--gray-200);
+  font-size: var(--font-size-smaller);
+  font-weight: 600;
+  color: var(--color-accent-default);
+}
+
+/* ── Responsive: collapse table on narrow screens ── */
+@media (max-width: 48rem) {
+  .admin-table thead { display: none; }
+  .admin-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .admin-table td {
+    border-bottom: none;
+    padding: 0.15rem 0;
+  }
+  .admin-table td::before {
+    content: attr(data-label) ': ';
+    font-weight: 600;
+    font-size: var(--font-size-smallest);
+    opacity: 0.6;
+  }
+  .admin-input { min-width: 0; width: 100%; }
+  .admin-toolbar { flex-direction: column; align-items: stretch; }
+  .admin-toolbar .admin-toolbar-end { margin-inline-start: 0; }
+}

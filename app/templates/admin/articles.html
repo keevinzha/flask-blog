@@ -1,19 +1,206 @@
-<!DOCTYPE html>
-<html>
-<head><title>文章管理</title></head>
-<body>
-<h1>文章管理</h1>
-<a href="{{ url_for('admin.new_article') }}">新建文章</a>
-<table>
-    <tr><th>标题</th><th>分类</th><th>状态</th><th>创建时间</th></tr>
-    {% for article in pagination.items %}
+{% extends "base.html" %}
+
+{# ──────────────────────────────────────────
+   Expected context from Flask view:
+     site_title   – str
+     site_logo    – str | None
+     nav_items    – list[dict]
+     articles     – list[Article]  each has:
+                      id, title, slug, date, published, featured,
+                      categories (list), tags (list)
+     pagination   – flask_sqlalchemy Pagination | None
+     categories   – list[Category]  for the filter dropdown
+     search_q     – str   current search query
+     filter_cat   – str   current category filter value
+     copyright    – str | None
+──────────────────────────────────────────── #}
+
+{% block title %}文章管理 – {{ site_title }}{% endblock %}
+{% block description %}后台文章列表{% endblock %}
+{% block header_title %}文章管理{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
+{# No TOC needed in admin #}
+{% block toc %}{% endblock %}
+{% block show_toc_icon %}{% endblock %}
+
+{% block content %}
+
+{# ── Flash messages ── #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <ul class="admin-flashes">
+    {% for category, message in messages %}
+    <li class="flash-{{ category }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endwith %}
+
+{# ── Toolbar ── #}
+<form method="get" action="" class="admin-toolbar">
+  {# Search #}
+  <input
+    type="search"
+    name="q"
+    value="{{ search_q | default('') }}"
+    placeholder="搜索标题 / Slug…"
+    class="admin-input"
+    aria-label="搜索文章"
+  />
+
+  {# Category filter #}
+  <select name="cat" class="admin-select" aria-label="按分类筛选">
+    <option value="">全部分类</option>
+    {% for cat in (categories or []) %}
+    <option value="{{ cat.name }}"
+      {% if filter_cat == cat.name %}selected{% endif %}>
+      {{ cat.name }}
+    </option>
+    {% endfor %}
+  </select>
+
+  <button type="submit" class="btn btn-secondary">筛选</button>
+  {% if search_q or filter_cat %}
+  <a href="{{ url_for(request.endpoint) }}" class="btn btn-secondary">清除</a>
+  {% endif %}
+
+  <div class="admin-toolbar-end">
+    <a href="{{ url_for('admin.article_new') }}" class="btn btn-primary">
+      <svg class="book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      新建文章
+    </a>
+  </div>
+</form>
+
+{# ── Article table ── #}
+<div style="overflow-x:auto">
+<table class="admin-table">
+  <thead>
     <tr>
-        <td>{{ article.title }}</td>
-        <td>{{ article.category.name if article.category else '无' }}</td>
-        <td>{{ '已发布' if article.is_published else '草稿' }}</td>
-        <td>{{ article.created_at.strftime('%Y-%m-%d') }}</td>
+      <th>标题</th>
+      <th>Slug</th>
+      <th>分类</th>
+      <th>标签</th>
+      <th class="col-date">日期</th>
+      <th class="col-status">状态</th>
+      <th class="col-actions">操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for article in (articles or []) %}
+    <tr>
+      <td data-label="标题">
+        <a href="{{ url_for('blog.article_detail', slug=article.slug) }}" target="_blank" rel="noopener">
+          {{ article.title }}
+        </a>
+      </td>
+      <td data-label="Slug">
+        <code style="font-size:var(--font-size-smallest)">{{ article.slug }}</code>
+      </td>
+      <td data-label="分类">
+        {% for cat in ([article.category] if article.category else [] or []) %}
+          {% if not loop.first %}, {% endif %}{{ cat.name }}
+        {% endfor %}
+      </td>
+      <td data-label="标签">
+        {% for tag in (article.tags or []) %}
+          {% if not loop.first %}, {% endif %}{{ tag.name }}
+        {% endfor %}
+      </td>
+      <td data-label="日期" class="col-date">
+        {% if article.created_at %}{{ article.created_at.strftime('%Y-%m-%d') }}{% endif %}
+      </td>
+      <td data-label="状态" class="col-status">
+        {% if article.is_published %}
+          <span class="badge badge-published">已发布</span>
+        {% else %}
+          <span class="badge badge-draft">草稿</span>
+        {% endif %}
+        {% if article.is_recommended %}
+          <span class="badge badge-featured">推荐</span>
+        {% endif %}
+      </td>
+      <td class="col-actions">
+        <a href="{{ url_for('admin.article_edit', article_id=article.id) }}"
+           class="btn btn-secondary btn-sm">编辑</a>
+
+        {# Delete via small form to allow POST + CSRF #}
+        <form method="post"
+              action="{{ url_for('admin.article_delete', article_id=article.id) }}"
+              style="display:inline"
+              onsubmit="return confirm('确认删除《{{ article.title | e }}》？')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-danger btn-sm">删除</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="7" style="text-align:center;opacity:.5;padding:2rem 0">
+        暂无文章
+        {% if search_q or filter_cat %} — 试着清除筛选条件{% endif %}
+      </td>
     </tr>
     {% endfor %}
+  </tbody>
 </table>
-</body>
-</html>
+</div>
+
+{# ── Pagination ── #}
+{% if pagination and pagination.pages > 1 %}
+<div class="flex flex-wrap justify-between" style="margin-top:.5rem;font-size:var(--font-size-smaller)">
+  <span>
+    {% if pagination.has_prev %}
+    <a href="{{ url_for(request.endpoint, page=pagination.prev_num,
+                        q=search_q, cat=filter_cat, **request.view_args) }}"
+       class="btn btn-secondary btn-sm">
+      <svg class="book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      上一页
+    </a>
+    {% endif %}
+  </span>
+
+  <span class="flex align-center gap">
+    {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if p %}
+        {% if p == pagination.page %}
+          <span style="font-weight:bold">{{ p }}</span>
+        {% else %}
+          <a href="{{ url_for(request.endpoint, page=p,
+                              q=search_q, cat=filter_cat, **request.view_args) }}">{{ p }}</a>
+        {% endif %}
+      {% else %}
+        <span>…</span>
+      {% endif %}
+    {% endfor %}
+    <span style="opacity:.5">/ {{ pagination.pages }} 页，共 {{ pagination.total }} 篇</span>
+  </span>
+
+  <span>
+    {% if pagination.has_next %}
+    <a href="{{ url_for(request.endpoint, page=pagination.next_num,
+                        q=search_q, cat=filter_cat, **request.view_args) }}"
+       class="btn btn-secondary btn-sm">
+      下一页
+      <svg class="book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </a>
+    {% endif %}
+  </span>
+</div>
+{% endif %}
+
+{% endblock %}

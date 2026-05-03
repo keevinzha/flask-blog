@@ -8,6 +8,7 @@
 import os
 from dotenv import load_dotenv
 load_dotenv()
+WTF_CSRF_ENABLED = True
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')

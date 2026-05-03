@@ -13,6 +13,7 @@ from slugify import slugify
 
 admin = Blueprint('admin', __name__)
 
+
 @admin.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -24,14 +25,16 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             return redirect(url_for('admin.dashboard'))
-        flash('用户名或密码错误')
+        flash('用户名或密码错误', 'error')
     return render_template('admin/login.html')
+
 
 @admin.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('main.index'))
+
 
 @admin.route('/')
 @login_required
@@ -46,34 +49,130 @@ def dashboard():
                            category_count=category_count,
                            tag_count=tag_count)
 
+
 @admin.route('/articles')
 @login_required
 def articles():
     page = request.args.get('page', 1, type=int)
-    pagination = Article.query.order_by(Article.created_at.desc())\
-        .paginate(page=page, per_page=20)
-    return render_template('admin/articles.html', pagination=pagination)
+    search_q = request.args.get('q', '')
+    filter_cat = request.args.get('cat', '')
+
+    query = Article.query
+    if search_q:
+        query = query.filter(
+            Article.title.contains(search_q) | Article.slug.contains(search_q)
+        )
+    if filter_cat:
+        query = query.join(Category).filter(Category.name == filter_cat)
+
+    pagination = query.order_by(Article.created_at.desc()).paginate(page=page, per_page=20)
+    categories = Category.query.all()
+
+    return render_template('admin/articles.html',
+                           articles=pagination.items,
+                           pagination=pagination,
+                           categories=categories,
+                           search_q=search_q,
+                           filter_cat=filter_cat)
+
 
 @admin.route('/articles/new', methods=['GET', 'POST'])
 @login_required
-def new_article():
+def article_new():
     if request.method == 'POST':
-        article = Article(
-            title=request.form.get('title'),
-            slug=slugify(request.form.get('slug') or request.form.get('title')),
-            summary=request.form.get('summary'),
-            content=request.form.get('content'),
-            category_id=request.form.get('category_id') or None,
-            is_published=bool(request.form.get('is_published')),
-            is_recommended=bool(request.form.get('is_recommended')),
-        )
-        db.session.add(article)
-        db.session.commit()
-        return redirect(url_for('admin.articles'))
+        return _save_article(None)
     categories = Category.query.all()
     tags = Tag.query.all()
     series_list = Series.query.all()
-    return render_template('admin/new_article.html',
+    return render_template('admin/article_form.html',
+                           article=None,
                            categories=categories,
-                           tags=tags,
-                           series_list=series_list)
+                           all_tags=tags,
+                           series_list=series_list,
+                           form_errors=None)
+
+
+@admin.route('/articles/<int:article_id>/edit', methods=['GET', 'POST'])
+@login_required
+def article_edit(article_id):
+    article = Article.query.get_or_404(article_id)
+    if request.method == 'POST':
+        return _save_article(article)
+    categories = Category.query.all()
+    tags = Tag.query.all()
+    series_list = Series.query.all()
+    return render_template('admin/article_form.html',
+                           article=article,
+                           categories=categories,
+                           all_tags=tags,
+                           series_list=series_list,
+                           form_errors=None)
+
+
+@admin.route('/articles/<int:article_id>/delete', methods=['POST'])
+@login_required
+def article_delete(article_id):
+    article = Article.query.get_or_404(article_id)
+    db.session.delete(article)
+    db.session.commit()
+    flash('文章已删除', 'success')
+    return redirect(url_for('admin.articles'))
+
+
+@admin.route('/articles/save/<int:article_id>', methods=['POST'])
+@login_required
+def article_save(article_id):
+    article = Article.query.get(article_id) if article_id else None
+    return _save_article(article)
+
+
+def _save_article(article):
+    title = request.form.get('title', '').strip()
+    slug = slugify(request.form.get('slug', '').strip() or title)
+    summary = request.form.get('summary', '').strip()
+    content = request.form.get('body', '').strip()
+    action = request.form.get('action', 'publish')
+    is_published = action == 'publish'
+    is_recommended = bool(request.form.get('featured'))
+    series_id = request.form.get('series') or None
+
+    # 处理分类
+    cat_name = request.form.get('category', '').strip()
+    category = Category.query.filter_by(name=cat_name).first() if cat_name else None
+
+    # 处理标签
+    tag_names = [t.strip() for t in request.form.get('tags', '').split(',') if t.strip()]
+    tags = []
+    for name in tag_names:
+        tag = Tag.query.filter_by(name=name).first()
+        if not tag:
+            tag = Tag(name=name, slug=slugify(name))
+            db.session.add(tag)
+        tags.append(tag)
+
+    if article is None:
+        article = Article(
+            title=title,
+            slug=slug,
+            summary=summary,
+            content=content,
+            is_published=is_published,
+            is_recommended=is_recommended,
+            category_id=category.id if category else None,
+            series_id=series_id,
+        )
+        db.session.add(article)
+    else:
+        article.title = title
+        article.slug = slug
+        article.summary = summary
+        article.content = content
+        article.is_published = is_published
+        article.is_recommended = is_recommended
+        article.category_id = category.id if category else None
+        article.series_id = series_id
+
+    article.tags = tags
+    db.session.commit()
+    flash('文章已保存', 'success')
+    return redirect(url_for('admin.articles'))

@@ -8,6 +8,8 @@
 import os
 from app import create_app, db
 from app.models import User, Category, Tag, Series, Article
+from dotenv import load_dotenv
+load_dotenv()
 
 app = create_app(os.getenv('FLASK_CONFIG', 'default'))
 
