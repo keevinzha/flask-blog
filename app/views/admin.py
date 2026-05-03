@@ -176,3 +176,131 @@ def _save_article(article):
     db.session.commit()
     flash('文章已保存', 'success')
     return redirect(url_for('admin.articles'))
+
+@admin.route('/categories')
+@login_required
+def categories():
+    categories = Category.query.all()
+    return render_template('admin/categories.html', categories=categories)
+
+@admin.route('/categories/new', methods=['GET', 'POST'])
+@login_required
+def category_new():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        slug = slugify(request.form.get('slug', '').strip() or name)
+        description = request.form.get('description', '').strip()
+        category = Category(name=name, slug=slug, description=description)
+        db.session.add(category)
+        db.session.commit()
+        flash('分类已创建', 'success')
+        return redirect(url_for('admin.categories'))
+    return render_template('admin/category_form.html', category=None)
+
+@admin.route('/categories/<int:category_id>/edit', methods=['GET', 'POST'])
+@login_required
+def category_edit(category_id):
+    category = Category.query.get_or_404(category_id)
+    if request.method == 'POST':
+        category.name = request.form.get('name', '').strip()
+        category.slug = slugify(request.form.get('slug', '').strip() or category.name)
+        category.description = request.form.get('description', '').strip()
+        db.session.commit()
+        flash('分类已更新', 'success')
+        return redirect(url_for('admin.categories'))
+    return render_template('admin/category_form.html', category=category)
+
+@admin.route('/categories/<int:category_id>/delete', methods=['POST'])
+@login_required
+def category_delete(category_id):
+    category = Category.query.get_or_404(category_id)
+    Article.query.filter_by(category_id=category_id).update({'category_id': None})
+    db.session.delete(category)
+    db.session.commit()
+    flash('分类已删除', 'success')
+    return redirect(url_for('admin.categories'))
+
+@admin.route('/tags')
+@login_required
+def tags():
+    tags = Tag.query.all()
+    return render_template('admin/tags.html', tags=tags)
+
+@admin.route('/tags/new', methods=['GET', 'POST'])
+@login_required
+def tag_new():
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        slug = slugify(request.form.get('slug', '').strip() or name)
+        tag = Tag(name=name, slug=slug)
+        db.session.add(tag)
+        db.session.commit()
+        flash('标签已创建', 'success')
+        return redirect(url_for('admin.tags'))
+    return render_template('admin/tag_form.html', tag=None)
+
+@admin.route('/tags/<int:tag_id>/edit', methods=['GET', 'POST'])
+@login_required
+def tag_edit(tag_id):
+    tag = Tag.query.get_or_404(tag_id)
+    if request.method == 'POST':
+        tag.name = request.form.get('name', '').strip()
+        tag.slug = slugify(request.form.get('slug', '').strip() or tag.name)
+        db.session.commit()
+        flash('标签已更新', 'success')
+        return redirect(url_for('admin.tags'))
+    return render_template('admin/tag_form.html', tag=tag)
+
+@admin.route('/tags/<int:tag_id>/delete', methods=['POST'])
+@login_required
+def tag_delete(tag_id):
+    tag = Tag.query.get_or_404(tag_id)
+    tag.articles = []  # 清除中间表关联
+    db.session.delete(tag)
+    db.session.commit()
+    flash('标签已删除', 'success')
+    return redirect(url_for('admin.tags'))
+
+
+@admin.route('/series')
+@login_required
+def series_list():
+    series = Series.query.all()
+    return render_template('admin/series.html', series=series)
+
+@admin.route('/series/new', methods=['GET', 'POST'])
+@login_required
+def series_new():
+    if request.method == 'POST':
+        title = request.form.get('title', '').strip()
+        slug = slugify(request.form.get('slug', '').strip() or title)
+        description = request.form.get('description', '').strip()
+        s = Series(title=title, slug=slug, description=description)
+        db.session.add(s)
+        db.session.commit()
+        flash('专题已创建', 'success')
+        return redirect(url_for('admin.series_list'))
+    return render_template('admin/series_form.html', series=None)
+
+@admin.route('/series/<int:series_id>/edit', methods=['GET', 'POST'])
+@login_required
+def series_edit(series_id):
+    series = Series.query.get_or_404(series_id)
+    if request.method == 'POST':
+        series.title = request.form.get('title', '').strip()
+        series.slug = slugify(request.form.get('slug', '').strip() or series.title)
+        series.description = request.form.get('description', '').strip()
+        db.session.commit()
+        flash('专题已更新', 'success')
+        return redirect(url_for('admin.series_list'))
+    return render_template('admin/series_form.html', series=series)
+
+@admin.route('/series/<int:series_id>/delete', methods=['POST'])
+@login_required
+def series_delete(series_id):
+    series = Series.query.get_or_404(series_id)
+    Article.query.filter_by(series_id=series_id).update({'series_id': None})
+    db.session.delete(series)
+    db.session.commit()
+    flash('专题已删除', 'success')
+    return redirect(url_for('admin.series_list'))

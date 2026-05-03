@@ -1,16 +1,5 @@
 {% extends "base.html" %}
 
-{# ──────────────────────────────────────────
-   Expected context from Flask view:
-     site_title   – str
-     site_logo    – str | None   (relative path under static/)
-     nav_items    – list[dict]
-     posts        – list[Post]   each has: title, slug, date, summary, thumbnail_url, tags, categories
-     pagination   – flask_sqlalchemy Pagination (or None)
-     current_tag  – str | None   (when filtering by tag)
-     copyright    – str | None
-──────────────────────────────────────────── #}
-
 {% block title %}
   {% if current_tag %}{{ current_tag }} – {% endif %}{{ site_title }}
 {% endblock %}
@@ -21,7 +10,6 @@
 
 {% block header_title %}文章列表{% endblock %}
 
-{# TOC column: show tag/category cloud instead #}
 {% block toc %}
 <nav>
   {% if all_tags %}
@@ -31,8 +19,7 @@
       <ul>
         {% for tag in all_tags %}
         <li class="flex align-center">
-          <a href="{{ url_for('main.posts_by_tag', tag=tag.name) }}">{{ tag.name }}</a>
-          <span>{{ tag.count }}</span>
+          <a href="{{ url_for('blog.tag', slug=tag.slug) }}">{{ tag.name }}</a>
         </li>
         {% endfor %}
       </ul>
@@ -47,8 +34,7 @@
       <ul>
         {% for cat in all_categories %}
         <li class="flex align-center">
-          <a href="{{ url_for('blog.category', category=cat.name) }}">{{ cat.name }}</a>
-          <span>{{ cat.count }}</span>
+          <a href="{{ url_for('blog.category', slug=cat.slug) }}">{{ cat.name }}</a>
         </li>
         {% endfor %}
       </ul>
@@ -67,8 +53,7 @@
 
   <div class="book-post-container flex gap">
     <div>
-      {# Post meta: date + tags #}
-      {% if post.date %}
+      {% if post.created_at %}
       <div class="flex align-center text-small book-post-date">
         <svg class="book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" stroke-width="2">
@@ -77,7 +62,7 @@
           <line x1="8"  y1="2" x2="8"  y2="6"/>
           <line x1="3"  y1="10" x2="21" y2="10"/>
         </svg>
-        <span>{{ post.date.strftime('%Y-%m-%d') }}</span>
+        <span>{{ post.created_at.strftime('%Y-%m-%d') }}</span>
       </div>
       {% endif %}
 
@@ -85,23 +70,21 @@
       <div class="text-small">
         {% for tag in post.tags %}
           {% if not loop.first %}, {% endif %}
-          <a href="{{ url_for('blog.tag', tag=tag.name) }}">{{ tag.name }}</a>
+          <a href="{{ url_for('blog.tag', slug=tag.slug) }}">{{ tag.name }}</a>
         {% endfor %}
       </div>
       {% endif %}
 
-      {# Summary #}
+      {% if post.category %}
+      <div class="text-small">
+        <a href="{{ url_for('blog.category', slug=post.category.slug) }}">{{ post.category.name }}</a>
+      </div>
+      {% endif %}
+
       <div class="book-post-content markdown-inner">
         {{ post.summary | safe }}
       </div>
     </div>
-
-    {# Optional thumbnail #}
-    {% if post.thumbnail_url %}
-    <div class="book-post-thumbnail">
-      <img src="{{ post.thumbnail_url }}" alt="{{ post.title }}" />
-    </div>
-    {% endif %}
   </div>
 </article>
 {% else %}
@@ -110,7 +93,6 @@
 </article>
 {% endfor %}
 
-{# ── Pagination ── #}
 {% if pagination and pagination.pages > 1 %}
 <div class="flex flex-wrap justify-between" style="margin-top:1rem">
   <span>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}后台管理 – {{ site_title }}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/book.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+  <main class="container flex">
+
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        <nav>
+          <h2 class="book-brand">
+            <a class="flex align-center" href="{{ url_for('admin.dashboard') }}">
+              <span>{{ site_title }} 后台</span>
+            </a>
+          </h2>
+
+          <ul>
+            <li><a href="{{ url_for('admin.dashboard') }}"
+              {% if request.endpoint == 'admin.dashboard' %}class="active"{% endif %}>
+              仪表盘
+            </a></li>
+            <li class="book-section-flat">
+              <span>内容管理</span>
+              <ul>
+                <li><a href="{{ url_for('admin.articles') }}"
+                  {% if 'article' in request.endpoint %}class="active"{% endif %}>
+                  文章
+                </a></li>
+                <li><a href="{{ url_for('admin.categories') }}"
+                  {% if 'categor' in request.endpoint %}class="active"{% endif %}>
+                  分类
+                </a></li>
+                <li><a href="{{ url_for('admin.tags') }}"
+                  {% if 'tag' in request.endpoint %}class="active"{% endif %}>
+                  标签
+                </a></li>
+                <li><a href="{{ url_for('admin.series_list') }}"
+                  {% if 'series' in request.endpoint %}class="active"{% endif %}>
+                  专题
+                </a></li>
+              </ul>
+            </li>
+          </ul>
+
+          <ul style="margin-top:auto">
+            <li><a href="{{ url_for('main.index') }}" target="_blank">查看博客</a></li>
+            <li><a href="{{ url_for('admin.logout') }}">退出登录</a></li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header hidden">
+        <div class="flex align-center justify-between">
+          <label for="menu-control">
+            <svg class="book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </label>
+          <h3>{% block header_title %}{% endblock %}</h3>
+          <span></span>
+        </div>
+      </header>
+
+      <div class="book-post">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+          <ul class="admin-flashes">
+            {% for category, message in messages %}
+            <li class="flash-{{ category }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+      </div>
+
+      <footer class="book-footer">
+        <div class="book-copyright flex justify-center">
+          <span>{{ copyright }}</span>
+        </div>
+      </footer>
+    </div>
+
+  </main>
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

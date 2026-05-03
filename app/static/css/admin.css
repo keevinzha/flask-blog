@@ -98,10 +98,11 @@
 .btn:hover { opacity: 0.8; text-decoration: none; }
 .btn:active { opacity: 0.6; }
 
-.btn-primary {
-  background: var(--color-accent-default);
-  color: #fff;
-  border-color: var(--color-accent-default);
+.btn-primary,
+a.btn-primary {
+  background: var(--color-accent-note);
+  color: #fff !important;
+  border-color: var(--color-accent-note);
 }
 .btn-secondary {
   background: var(--gray-100);
@@ -289,4 +290,12 @@
   .admin-input { min-width: 0; width: 100%; }
   .admin-toolbar { flex-direction: column; align-items: stretch; }
   .admin-toolbar .admin-toolbar-end { margin-inline-start: 0; }
+}
+a.btn {
+  flex: none !important;
+  width: auto !important;
+  align-self: flex-start !important;
+}
+a.btn.btn-secondary {
+  color: var(--body-font-color) !important;
 }

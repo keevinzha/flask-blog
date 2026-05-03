@@ -1,0 +1,43 @@
+{% extends "admin/admin_base.html" %}
+{% set is_edit = series is not none and series.id %}
+{% set page_title = ('编辑专题' if is_edit else '新建专题') %}
+{% block title %}{{ page_title }} – {{ site_title }}{% endblock %}
+{% block header_title %}{{ page_title }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+{% block toc %}{% endblock %}
+{% block show_toc_icon %}{% endblock %}
+
+{% block content %}
+<div style="font-size:var(--font-size-smaller);margin-bottom:1.25rem;opacity:.7">
+  <a href="{{ url_for('admin.series_list') }}">专题管理</a> / <span>{{ page_title }}</span>
+</div>
+
+<form method="post" class="admin-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  <div class="form-group">
+    <label for="title">标题 *</label>
+    <input id="title" name="title" type="text" class="admin-input" style="width:100%"
+           value="{{ series.title if is_edit else '' }}" required>
+  </div>
+
+  <div class="form-group">
+    <label for="slug">Slug *</label>
+    <input id="slug" name="slug" type="text" class="admin-input" style="width:100%"
+           value="{{ series.slug if is_edit else '' }}" required>
+  </div>
+
+  <div class="form-group">
+    <label for="description">描述</label>
+    <textarea id="description" name="description" class="admin-textarea" rows="3"
+    >{{ series.description if is_edit else '' }}</textarea>
+  </div>
+
+  <div class="flex gap" style="margin-top:1.5rem">
+    <button type="submit" class="btn btn-primary">{{ '保存' if is_edit else '创建' }}</button>
+    <a href="{{ url_for('admin.series_list') }}" class="btn btn-secondary">取消</a>
+  </div>
+</form>
+{% endblock %}

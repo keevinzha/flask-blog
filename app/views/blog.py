@@ -5,7 +5,7 @@
 @File ：blog.py
 @IDE ：PyCharm
 """
-from flask import Blueprint, render_template, abort, request
+from flask import Blueprint, render_template, request
 from app import db
 from app.models import Article, Category, Tag, Series
 from app import cache
@@ -20,7 +20,9 @@ def index():
     pagination = Article.query.filter_by(is_published=True)\
         .order_by(Article.created_at.desc())\
         .paginate(page=page, per_page=10)
-    return render_template('post_list.html', posts=pagination.items, pagination=pagination)
+    return render_template('post_list.html',
+                           posts=pagination.items,
+                           pagination=pagination)
 
 @blog.route('/<slug>')
 def article_detail(slug):
@@ -46,25 +48,38 @@ def article_detail(slug):
 @blog.route('/category/<slug>')
 @cache.cached(timeout=300)
 def category(slug):
-    category = Category.query.filter_by(slug=slug).first_or_404()
+    cat = Category.query.filter_by(slug=slug).first_or_404()
     page = request.args.get('page', 1, type=int)
-    pagination = category.articles.filter_by(is_published=True)\
+    pagination = cat.articles.filter_by(is_published=True)\
         .order_by(Article.created_at.desc())\
         .paginate(page=page, per_page=10)
-    return render_template('blog/category.html', category=category, pagination=pagination)
+    return render_template('post_list.html',
+                           posts=pagination.items,
+                           pagination=pagination,
+                           current_category=cat)
 
 @blog.route('/tag/<slug>')
 @cache.cached(timeout=300)
 def tag(slug):
-    tag = Tag.query.filter_by(slug=slug).first_or_404()
+    t = Tag.query.filter_by(slug=slug).first_or_404()
     page = request.args.get('page', 1, type=int)
-    pagination = tag.articles.filter_by(is_published=True)\
+    pagination = t.articles.filter_by(is_published=True)\
         .order_by(Article.created_at.desc())\
         .paginate(page=page, per_page=10)
-    return render_template('blog/tag.html', tag=tag, pagination=pagination)
+    return render_template('post_list.html',
+                           posts=pagination.items,
+                           pagination=pagination,
+                           current_tag=t.name)
 
 @blog.route('/series/<slug>')
 @cache.cached(timeout=300)
 def series(slug):
-    series = Series.query.filter_by(slug=slug).first_or_404()
-    return render_template('blog/series.html', series=series)
+    s = Series.query.filter_by(slug=slug).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    pagination = s.articles.filter_by(is_published=True)\
+        .order_by(Article.series_order.asc())\
+        .paginate(page=page, per_page=10)
+    return render_template('post_list.html',
+                           posts=pagination.items,
+                           pagination=pagination,
+                           current_series=s)

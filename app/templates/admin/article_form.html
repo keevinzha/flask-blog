@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "admin/admin_base.html" %}
 
 {% set is_edit = article is not none and article.id %}
 {% set page_title = ('编辑文章' if is_edit else '新建文章') %}
@@ -17,16 +17,6 @@
 {% block show_toc_icon %}{% endblock %}
 
 {% block content %}
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-  <ul class="admin-flashes">
-    {% for category, message in messages %}
-    <li class="flash-{{ category }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-{% endwith %}
 
 <div style="font-size:var(--font-size-smaller);margin-bottom:1.25rem;opacity:.7">
   <a href="{{ url_for('admin.articles') }}">文章管理</a>

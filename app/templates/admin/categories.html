@@ -1,0 +1,48 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}分类管理 – {{ site_title }}{% endblock %}
+{% block header_title %}分类管理{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+{% block toc %}{% endblock %}
+{% block show_toc_icon %}{% endblock %}
+
+{% block content %}
+<div class="admin-toolbar">
+  <div class="admin-toolbar-end">
+    <a href="{{ url_for('admin.category_new') }}" class="btn btn-primary">新建分类</a>
+  </div>
+</div>
+
+<table class="admin-table">
+  <thead>
+    <tr>
+      <th>名称</th>
+      <th>Slug</th>
+      <th>描述</th>
+      <th>文章数</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cat in categories %}
+    <tr>
+      <td>{{ cat.name }}</td>
+      <td><code>{{ cat.slug }}</code></td>
+      <td>{{ cat.description or '—' }}</td>
+      <td>{{ cat.articles.count() }}</td>
+      <td>
+        <a href="{{ url_for('admin.category_edit', category_id=cat.id) }}" class="btn btn-secondary btn-sm">编辑</a>
+        <form method="post" action="{{ url_for('admin.category_delete', category_id=cat.id) }}"
+              style="display:inline" onsubmit="return confirm('确认删除「{{ cat.name }}」？')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-danger btn-sm">删除</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" style="text-align:center;opacity:.5;padding:2rem 0">暂无分类</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
