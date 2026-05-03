@@ -10,28 +10,30 @@
 
   <title>{% block title %}{{ site_title }}{% endblock %}</title>
 
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/book.css') }}">
   {% block extra_css %}{% endblock %}
 
-  {# Search — fuse.js must be at static/js/fuse.min.js #}
   <script defer src="{{ url_for('static', filename='js/fuse.min.js') }}"></script>
   <script defer src="{{ url_for('static', filename='js/search.js') }}"></script>
+
+<style>
+.book-page {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100vh !important;
+}
+</style>
 </head>
 <body>
-  {# Hidden checkboxes control menu / toc visibility on mobile — no JS required #}
   <input type="checkbox" class="hidden toggle" id="menu-control" />
   <input type="checkbox" class="hidden toggle" id="toc-control" />
 
   <main class="container flex">
 
-    {# ══════════════════════════════════════════
-       Left column: Navigation Menu
-    ══════════════════════════════════════════ #}
     <aside class="book-menu">
       <div class="book-menu-content">
         <nav>
-
-          {# ── Brand / logo ── #}
           <h2 class="book-brand">
             <a class="flex align-center" href="{{ url_for('main.index') }}">
               {% if site_logo %}
@@ -41,7 +43,6 @@
             </a>
           </h2>
 
-          {# ── Search box ── #}
           <div class="book-search hidden">
             <input id="book-search-input" type="text"
               placeholder="搜索"
@@ -54,10 +55,6 @@
           </div>
           <script>document.querySelector(".book-search").classList.remove("hidden")</script>
 
-          {# ── Navigation items ──
-             Pass nav_items from Flask — each item is a dict:
-               { title, url, children: [{ title, url }] }
-          #}
           {% block nav_menu %}
           <ul>
             {% for item in (nav_items or []) %}
@@ -93,17 +90,11 @@
             {% endfor %}
           </ul>
           {% endblock %}
-
         </nav>
       </div>
     </aside>
 
-    {# ══════════════════════════════════════════
-       Middle column: Page content
-    ══════════════════════════════════════════ #}
     <div class="book-page">
-
-      {# Mobile-only header bar (hidden on desktop via CSS) #}
       <header class="book-header hidden">
         <div class="flex align-center justify-between">
           <label for="menu-control">
@@ -129,32 +120,31 @@
           </label>
         </div>
 
-        {# Mobile TOC — slides in when toc-control is checked #}
         <aside class="hidden">
           {{ self.toc() }}
         </aside>
       </header>
 
-      {# ── Main page content ── #}
-      {% block content %}{% endblock %}
+      <div style="flex:1">{% block content %}{% endblock %}</div>
 
-      {# ── Footer under content ── #}
-      <footer class="book-footer">
+      <footer class="book-footer" style="margin-bottom:2rem">
         {% block footer %}{% endblock %}
 
-        {% if copyright %}
-        <div class="book-copyright flex justify-center">
-          <span>{{ copyright }}</span>
+        <div style="text-align:center;margin-top:1rem">
+          {% if copyright %}
+          <div style="font-size:var(--font-size-smaller);opacity:.6">{{ copyright }}</div>
+          {% endif %}
+          {% if icp %}
+          <div style="font-size:var(--font-size-smaller);opacity:.6">
+            <a href="https://beian.miit.gov.cn/" target="_blank">{{ icp }}</a>
+          </div>
+          {% endif %}
         </div>
-        {% endif %}
       </footer>
 
       <label for="menu-control" class="hidden book-menu-overlay"></label>
     </div>
 
-    {# ══════════════════════════════════════════
-       Right column: Table of Contents
-    ══════════════════════════════════════════ #}
     <aside class="book-toc">
       <div class="book-toc-content">
         {% block toc %}{% endblock %}
@@ -167,12 +157,12 @@
   {% block extra_js %}{% endblock %}
 
   <script>
-      MathJax = {
-          tex: {
-              inlineMath: [['$', '$']],
-              displayMath: [['$$', '$$']]
-          }
-      };
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$']],
+        displayMath: [['$$', '$$']]
+      }
+    };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </body>

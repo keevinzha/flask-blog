@@ -35,7 +35,8 @@ def create_app(config_name='default'):
                 {'title': '所有文章', 'url': '/blog'},
                 {'title': '关于', 'url': '/about'},
             ],
-            copyright='2026 © keevinzha'
+            copyright='2026 © keevinzha',
+            icp = '蒙ICP备2022001190号-1'
         )
 
     from app.views.main import main as main_blueprint
