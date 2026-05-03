@@ -50,3 +50,6 @@ staticfiles/
 # Distribution
 *.tar.gz
 *.zip
+
+.idea/
+*.iml
