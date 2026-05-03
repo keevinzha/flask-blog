@@ -7,7 +7,7 @@
 """
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
-from app import db
+from app import db, cache
 from app.models import User, Article, Category, Tag, Series
 from slugify import slugify
 
@@ -174,6 +174,7 @@ def _save_article(article):
 
     article.tags = tags
     db.session.commit()
+    cache.clear()
     flash('文章已保存', 'success')
     return redirect(url_for('admin.articles'))
 
@@ -193,6 +194,7 @@ def category_new():
         category = Category(name=name, slug=slug, description=description)
         db.session.add(category)
         db.session.commit()
+        cache.clear()
         flash('分类已创建', 'success')
         return redirect(url_for('admin.categories'))
     return render_template('admin/category_form.html', category=None)
@@ -206,6 +208,7 @@ def category_edit(category_id):
         category.slug = slugify(request.form.get('slug', '').strip() or category.name)
         category.description = request.form.get('description', '').strip()
         db.session.commit()
+        cache.clear()
         flash('分类已更新', 'success')
         return redirect(url_for('admin.categories'))
     return render_template('admin/category_form.html', category=category)
@@ -217,6 +220,7 @@ def category_delete(category_id):
     Article.query.filter_by(category_id=category_id).update({'category_id': None})
     db.session.delete(category)
     db.session.commit()
+    cache.clear()
     flash('分类已删除', 'success')
     return redirect(url_for('admin.categories'))
 
@@ -235,6 +239,7 @@ def tag_new():
         tag = Tag(name=name, slug=slug)
         db.session.add(tag)
         db.session.commit()
+        cache.clear()
         flash('标签已创建', 'success')
         return redirect(url_for('admin.tags'))
     return render_template('admin/tag_form.html', tag=None)
@@ -247,6 +252,7 @@ def tag_edit(tag_id):
         tag.name = request.form.get('name', '').strip()
         tag.slug = slugify(request.form.get('slug', '').strip() or tag.name)
         db.session.commit()
+        cache.clear()
         flash('标签已更新', 'success')
         return redirect(url_for('admin.tags'))
     return render_template('admin/tag_form.html', tag=tag)
@@ -258,6 +264,7 @@ def tag_delete(tag_id):
     tag.articles = []  # 清除中间表关联
     db.session.delete(tag)
     db.session.commit()
+    cache.clear()
     flash('标签已删除', 'success')
     return redirect(url_for('admin.tags'))
 
@@ -278,6 +285,7 @@ def series_new():
         s = Series(title=title, slug=slug, description=description)
         db.session.add(s)
         db.session.commit()
+        cache.clear()
         flash('专题已创建', 'success')
         return redirect(url_for('admin.series_list'))
     return render_template('admin/series_form.html', series=None)
@@ -291,6 +299,7 @@ def series_edit(series_id):
         series.slug = slugify(request.form.get('slug', '').strip() or series.title)
         series.description = request.form.get('description', '').strip()
         db.session.commit()
+        cache.clear()
         flash('专题已更新', 'success')
         return redirect(url_for('admin.series_list'))
     return render_template('admin/series_form.html', series=series)
@@ -302,5 +311,6 @@ def series_delete(series_id):
     Article.query.filter_by(series_id=series_id).update({'series_id': None})
     db.session.delete(series)
     db.session.commit()
+    cache.clear()
     flash('专题已删除', 'success')
     return redirect(url_for('admin.series_list'))

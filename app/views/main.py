@@ -17,16 +17,12 @@ main = Blueprint('main', __name__)
 @main.route('/')
 @cache.cached(timeout=300)
 def index():
-    recommended = Article.query.filter_by(
-        is_published=True, is_recommended=True
-    ).order_by(Article.created_at.desc()).limit(6).all()
-
     recent = Article.query.filter_by(
-        is_published=True
+        is_published=True,
+        is_recommended=True
     ).order_by(Article.created_at.desc()).limit(10).all()
 
     categories = Category.query.all()
-    series_list = Series.query.all()
 
     return render_template('post_list.html',
                            posts=recent,

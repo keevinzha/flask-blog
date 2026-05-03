@@ -5,6 +5,10 @@
 
 {% block header_title %}{{ post.title }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css">
+{% endblock %}
+
 {% block toc %}
 {% if toc_html %}
 {{ toc_html | safe }}
@@ -49,6 +53,8 @@
     {{ content_html | safe }}
   </div>
 </article>
+
+<div id="waline" style="margin-top:2rem"></div>
 {% endblock %}
 
 {% block footer %}
@@ -79,4 +85,16 @@
 </div>
 {% endif %}
 {{ super() }}
+{% endblock %}
+
+{% block extra_js %}
+<script type="module">
+  import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+  init({
+    el: '#waline',
+    serverURL: 'https://comments.keevinzha.com',
+    lang: 'zh-CN',
+    dark: 'auto',
+  });
+</script>
 {% endblock %}
