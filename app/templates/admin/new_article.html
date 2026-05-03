@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head><title>新建文章</title></head>
+<body>
+<form method="POST">
+    <input type="text" name="title" placeholder="标题"><br>
+    <input type="text" name="slug" placeholder="slug（留空自动生成）"><br>
+    <input type="text" name="summary" placeholder="摘要"><br>
+    <select name="category_id">
+        <option value="">无分类</option>
+        {% for cat in categories %}
+        <option value="{{ cat.id }}">{{ cat.name }}</option>
+        {% endfor %}
+    </select><br>
+    <textarea name="content" rows="20" cols="80" placeholder="Markdown内容"></textarea><br>
+    <input type="checkbox" name="is_published"> 发布<br>
+    <input type="checkbox" name="is_recommended"> 推荐<br>
+    <button type="submit">保存</button>
+</form>
+</body>
+</html>

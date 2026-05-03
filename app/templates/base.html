@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="{{ g.lang | default('zh') }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="{% block description %}{{ site_title }}{% endblock %}">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2e3440">
+  <meta name="color-scheme" content="light dark">
+
+  <title>{% block title %}{{ site_title }}{% endblock %}</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/book.css') }}">
+  {% block extra_css %}{% endblock %}
+
+  {# Search — fuse.js must be at static/js/fuse.min.js #}
+  <script defer src="{{ url_for('static', filename='js/fuse.min.js') }}"></script>
+  <script defer src="{{ url_for('static', filename='js/search.js') }}"></script>
+</head>
+<body>
+  {# Hidden checkboxes control menu / toc visibility on mobile — no JS required #}
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+
+  <main class="container flex">
+
+    {# ══════════════════════════════════════════
+       Left column: Navigation Menu
+    ══════════════════════════════════════════ #}
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        <nav>
+
+          {# ── Brand / logo ── #}
+          <h2 class="book-brand">
+            <a class="flex align-center" href="{{ url_for('main.index') }}">
+              {% if site_logo %}
+              <img src="{{ url_for('static', filename=site_logo) }}" alt="logo" />
+              {% endif %}
+              <span>{{ site_title }}</span>
+            </a>
+          </h2>
+
+          {# ── Search box ── #}
+          <div class="book-search hidden">
+            <input id="book-search-input" type="text"
+              placeholder="搜索"
+              aria-label="搜索"
+              maxlength="64"
+              data-hotkeys="s/"
+              data-search-url="{{ url_for('main.search_data') }}" />
+            <div class="book-search-spinner hidden"></div>
+            <ul id="book-search-results"></ul>
+          </div>
+          <script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+          {# ── Navigation items ──
+             Pass nav_items from Flask — each item is a dict:
+               { title, url, children: [{ title, url }] }
+          #}
+          {% block nav_menu %}
+          <ul>
+            {% for item in (nav_items or []) %}
+              {% if item.children %}
+              <li class="book-section-flat">
+                {% if item.url %}
+                <a href="{{ item.url }}"
+                  {% if request.path == item.url %}class="active"{% endif %}>
+                  {{ item.title }}
+                </a>
+                {% else %}
+                <span>{{ item.title }}</span>
+                {% endif %}
+                <ul>
+                  {% for child in item.children %}
+                  <li>
+                    <a href="{{ child.url }}"
+                      {% if request.path == child.url %}class="active"{% endif %}>
+                      {{ child.title }}
+                    </a>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </li>
+              {% else %}
+              <li>
+                <a href="{{ item.url }}"
+                  {% if request.path == item.url %}class="active"{% endif %}>
+                  {{ item.title }}
+                </a>
+              </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+          {% endblock %}
+
+        </nav>
+      </div>
+    </aside>
+
+    {# ══════════════════════════════════════════
+       Middle column: Page content
+    ══════════════════════════════════════════ #}
+    <div class="book-page">
+
+      {# Mobile-only header bar (hidden on desktop via CSS) #}
+      <header class="book-header hidden">
+        <div class="flex align-center justify-between">
+          <label for="menu-control">
+            <svg class="book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6"  x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </label>
+
+          <h3>{% block header_title %}{% endblock %}</h3>
+
+          <label for="toc-control">
+            {% block show_toc_icon %}
+            <svg class="book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="6"  x2="21" y2="6"/>
+              <line x1="3" y1="12" x2="15" y2="12"/>
+              <line x1="3" y1="18" x2="18" y2="18"/>
+            </svg>
+            {% endblock %}
+          </label>
+        </div>
+
+        {# Mobile TOC — slides in when toc-control is checked #}
+        <aside class="hidden">
+          {{ self.toc() }}
+        </aside>
+      </header>
+
+      {# ── Main page content ── #}
+      {% block content %}{% endblock %}
+
+      {# ── Footer under content ── #}
+      <footer class="book-footer">
+        {% block footer %}{% endblock %}
+
+        {% if copyright %}
+        <div class="book-copyright flex justify-center">
+          <span>{{ copyright }}</span>
+        </div>
+        {% endif %}
+      </footer>
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    {# ══════════════════════════════════════════
+       Right column: Table of Contents
+    ══════════════════════════════════════════ #}
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        {% block toc %}{% endblock %}
+      </div>
+    </aside>
+
+  </main>
+
+  <script src="{{ url_for('static', filename='js/clipboard.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+
+  <script>
+      MathJax = {
+          tex: {
+              inlineMath: [['$', '$']],
+              displayMath: [['$$', '$$']]
+          }
+      };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</body>
+</html>

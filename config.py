@@ -6,16 +6,19 @@
 @IDE ：PyCharm
 """
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key')
+    SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     CACHE_TYPE = 'RedisCache'
     CACHE_REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost/flask_blog'
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
 
 class ProductionConfig(Config):
     DEBUG = False

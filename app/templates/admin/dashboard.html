@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><title>后台</title></head>
+<body>
+<h1>后台管理</h1>
+<p>文章总数: {{ article_count }}</p>
+<p>已发布: {{ published_count }}</p>
+<p>分类数: {{ category_count }}</p>
+<p>标签数: {{ tag_count }}</p>
+<a href="{{ url_for('admin.articles') }}">文章管理</a>
+<a href="{{ url_for('admin.logout') }}">退出</a>
+</body>
+</html>
