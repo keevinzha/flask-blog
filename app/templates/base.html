@@ -13,6 +13,7 @@
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/book.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/highlight.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cookie.css') }}">
   {% block extra_css %}{% endblock %}
 
   <script defer src="{{ url_for('static', filename='js/fuse.min.js') }}"></script>
@@ -38,6 +39,22 @@
 
 </style>
 </head>
+
+<div id="cookie-banner">
+  <span>🍪 这个网站使用 Cookie 来改善您的体验</span>
+  <button onclick="acceptCookie()" class="btn btn-primary btn-sm">接受</button>
+  <button onclick="dismissCookie()" class="btn btn-secondary btn-sm">拒绝</button>
+</div>
+
+<div id="cookie-overlay">
+  <div id="cookie-box">
+    <span id="cookie-emoji">🍪</span>
+    <div id="cookie-msg">这是你的 Cookie 🍪</div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/cookie.js') }}"></script>
+
 <body>
   <input type="checkbox" class="hidden toggle" id="menu-control" />
   <input type="checkbox" class="hidden toggle" id="toc-control" />
