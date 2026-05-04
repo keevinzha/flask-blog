@@ -10,6 +10,32 @@ import markdown
 from markdown.extensions.toc import TocExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
 
+class MathProtectExtension(markdown.Extension):
+    def extendMarkdown(self, md):
+        md.preprocessors.register(MathProtectPreprocessor(md), 'math_protect', 175)
+        md.postprocessors.register(MathProtectPostprocessor(md), 'math_restore', 25)
+
+class MathProtectPreprocessor(markdown.preprocessors.Preprocessor):
+    def run(self, lines):
+        self.md.math_blocks = {}
+        text = '\n'.join(lines)
+        import re
+        counter = [0]
+        def replace(m):
+            key = f'MATHBLOCK{counter[0]}MATHBLOCK'
+            self.md.math_blocks[key] = m.group(0)
+            counter[0] += 1
+            return key
+        text = re.sub(r'\$\$.+?\$\$', replace, text, flags=re.DOTALL)
+        text = re.sub(r'\$.+?\$', replace, text)
+        return text.split('\n')
+
+
+class MathProtectPostprocessor(markdown.postprocessors.Postprocessor):
+    def run(self, text):
+        for key, val in self.md.math_blocks.items():
+            text = text.replace(key, val)
+        return text
 
 def _add_default_lang(content, default='bash'):
     """Give unlabeled fenced code blocks a default language."""
@@ -38,12 +64,12 @@ def _add_default_lang(content, default='bash'):
 
 
 def render_markdown(content):
-    content = _add_default_lang(content)
     md = markdown.Markdown(extensions=[
         TocExtension(baselevel=2),
         'fenced_code',
         'tables',
         CodeHiliteExtension(linenums=False, css_class='highlight', guess_lang=False),
+        MathProtectExtension(),
     ])
     content_html = md.convert(content)
     toc_html = md.toc

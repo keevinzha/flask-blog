@@ -14,47 +14,32 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/book.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/highlight.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/cookie.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
   {% block extra_css %}{% endblock %}
 
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
   <script defer src="{{ url_for('static', filename='js/fuse.min.js') }}"></script>
   <script defer src="{{ url_for('static', filename='js/search.js') }}"></script>
 
-<style>
-.book-page {
-    display: flex !important;
-    flex-direction: column !important;
-    min-height: 100vh !important;
-}
-.book-toc {
-    font-size: 0.875rem;
-}
-.book-toc-content {
-    padding: 1rem;
-    line-height: 1.8;
-}
-.book-toc nav ol,
-.book-toc nav ul {
-    padding-left: 1rem;
-}
-
-</style>
+  <style>
+  .book-page {
+      display: flex !important;
+      flex-direction: column !important;
+      min-height: 100vh !important;
+  }
+  .book-toc {
+      font-size: 0.875rem;
+  }
+  .book-toc-content {
+      padding: 1rem;
+      line-height: 1.8;
+  }
+  .book-toc nav ol,
+  .book-toc nav ul {
+      padding-left: 1rem;
+  }
+  </style>
 </head>
-
-<div id="cookie-banner">
-  <span>🍪 这个网站使用 Cookie 来改善您的体验</span>
-  <button onclick="acceptCookie()" class="btn btn-primary btn-sm">接受</button>
-  <button onclick="dismissCookie()" class="btn btn-secondary btn-sm">拒绝</button>
-</div>
-
-<div id="cookie-overlay">
-  <div id="cookie-box">
-    <span id="cookie-emoji">🍪</span>
-    <div id="cookie-msg">这是你的 Cookie 🍪</div>
-  </div>
-</div>
-
-<script src="{{ url_for('static', filename='js/cookie.js') }}"></script>
-
 <body>
   <input type="checkbox" class="hidden toggle" id="menu-control" />
   <input type="checkbox" class="hidden toggle" id="toc-control" />
@@ -183,7 +168,40 @@
 
   </main>
 
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换主题">
+    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+         fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/>
+      <line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  </button>
+
+  <div id="cookie-banner">
+    <span>🍪 这个网站使用 Cookie 来改善您的体验</span>
+    <button onclick="acceptCookie()" class="btn btn-primary btn-sm">接受</button>
+    <button onclick="dismissCookie()" class="btn btn-secondary btn-sm">拒绝</button>
+  </div>
+
+  <div id="cookie-overlay">
+    <div id="cookie-box">
+      <span id="cookie-emoji">🍪</span>
+      <div id="cookie-msg">这是你的 Cookie 🍪</div>
+    </div>
+  </div>
+
   <script src="{{ url_for('static', filename='js/clipboard.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/cookie.js') }}"></script>
   {% block extra_js %}{% endblock %}
 
   <script>

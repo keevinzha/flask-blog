@@ -1,0 +1,92 @@
+/* ── 深色模式变量覆盖 ── */
+[data-theme="dark"] {
+  --body-background: #2e3440;
+  --body-font-color: #eceff4;
+  --color-link: #81a1c1;
+  --color-visited-link: #81a1c1;
+  --icon-filter: brightness(0) invert(1);
+  --gray-100: #3b4252;
+  --gray-200: #434c5e;
+  --gray-500: #d8dee9;
+  --color-accent-default:        #81a1c1;
+  --color-accent-default-tint:   rgba(129,161,193,.1);
+  --color-accent-note:           #5e81ac;
+  --color-accent-note-tint:      rgba(94,129,172,.1);
+  --color-accent-tip:            #a3be8c;
+  --color-accent-tip-tint:       rgba(163,190,140,.1);
+  --color-accent-important:      #b48ead;
+  --color-accent-important-tint: rgba(180,142,173,.1);
+  --color-accent-warning:        #d08770;
+  --color-accent-warning-tint:   rgba(208,135,112,.1);
+  --color-accent-caution:        #bf616a;
+  --color-accent-caution-tint:   rgba(191,97,106,.1);
+  --color-accent-info:           #5e81ac;
+  --color-accent-info-tint:      rgba(94,129,172,.1);
+  --color-accent-success:        #a3be8c;
+  --color-accent-success-tint:   rgba(163,190,140,.1);
+  --color-accent-danger:         #bf616a;
+  --color-accent-danger-tint:    rgba(191,97,106,.1);
+}
+
+/* 当系统为深色模式但用户手动切换为浅色时，强制恢复浅色变量 */
+@media (prefers-color-scheme: dark) {
+  [data-theme="light"] {
+    --body-background: #ffffff;
+    --body-font-color: #000000;
+    --color-link: #0055bb;
+    --color-visited-link: #5500bb;
+    --icon-filter: none;
+    --gray-100: #f8f9fa;
+    --gray-200: #e9ecef;
+    --gray-500: #adb5bd;
+    --color-accent-default:        #64748b;
+    --color-accent-default-tint:   rgba(100,116,139,.1);
+    --color-accent-note:           #4486dd;
+    --color-accent-note-tint:      rgba(68,134,221,.1);
+    --color-accent-tip:            #3bad3b;
+    --color-accent-tip-tint:       rgba(59,173,59,.1);
+    --color-accent-important:      #8144dd;
+    --color-accent-important-tint: rgba(129,68,221,.1);
+    --color-accent-warning:        #f59e42;
+    --color-accent-warning-tint:   rgba(245,158,66,.1);
+    --color-accent-caution:        #d84747;
+    --color-accent-caution-tint:   rgba(216,71,71,.1);
+    --color-accent-info:           #4486dd;
+    --color-accent-info-tint:      rgba(68,134,221,.1);
+    --color-accent-success:        #3bad3b;
+    --color-accent-success-tint:   rgba(59,173,59,.1);
+    --color-accent-danger:         #d84747;
+    --color-accent-danger-tint:    rgba(216,71,71,.1);
+  }
+}
+
+/* ── 主题切换按钮 ── */
+.theme-toggle {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--body-background);
+  border: 1px solid var(--gray-200);
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: opacity 0.2s;
+  z-index: 1001;
+}
+.theme-toggle:hover {
+  opacity: 0.8;
+}
+
+/* 默认（浅色）显示月亮，隐藏太阳 */
+.icon-moon { display: block; }
+.icon-sun  { display: none; }
+
+/* 深色模式下显示太阳，隐藏月亮 */
+[data-theme="dark"] .icon-moon { display: none; }
+[data-theme="dark"] .icon-sun  { display: block; }
