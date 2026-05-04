@@ -5,10 +5,12 @@
 @File ：admin.py
 @IDE ：PyCharm
 """
+import os
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db, cache
 from app.models import User, Article, Category, Tag, Series
+from app.models.about import Book, Project
 from slugify import slugify
 
 admin = Blueprint('admin', __name__)
@@ -115,6 +117,7 @@ def article_delete(article_id):
     article = Article.query.get_or_404(article_id)
     db.session.delete(article)
     db.session.commit()
+    cache.clear()
     flash('文章已删除', 'success')
     return redirect(url_for('admin.articles'))
 
@@ -314,3 +317,138 @@ def series_delete(series_id):
     cache.clear()
     flash('专题已删除', 'success')
     return redirect(url_for('admin.series_list'))
+
+@admin.route('/books')
+@login_required
+def books():
+    books = Book.query.order_by(Book.created_at.desc()).all()
+    return render_template('admin/books.html', books=books)
+
+@admin.route('/books/new', methods=['GET', 'POST'])
+@login_required
+def book_new():
+    if request.method == 'POST':
+        book = Book(
+            title=request.form.get('title', '').strip(),
+            author=request.form.get('author', '').strip(),
+            cover=request.form.get('cover', '').strip() or None,
+            url=request.form.get('url', '').strip() or None,
+            is_reading=bool(request.form.get('is_reading')),
+        )
+        db.session.add(book)
+        db.session.commit()
+        flash('书籍已添加', 'success')
+        return redirect(url_for('admin.books'))
+    return render_template('admin/book_form.html', book=None,
+                           google_books_key=os.getenv('GOOGLE_BOOKS_API_KEY'))
+
+@admin.route('/books/<int:book_id>/edit', methods=['GET', 'POST'])
+@login_required
+def book_edit(book_id):
+    book = Book.query.get_or_404(book_id)
+    if request.method == 'POST':
+        book.title = request.form.get('title', '').strip()
+        book.author = request.form.get('author', '').strip()
+        book.cover = request.form.get('cover', '').strip() or None
+        book.url = request.form.get('url', '').strip() or None
+        book.is_reading = bool(request.form.get('is_reading'))
+        db.session.commit()
+        flash('书籍已更新', 'success')
+        return redirect(url_for('admin.books'))
+    return render_template('admin/book_form.html', book=book,
+                           google_books_key=os.getenv('GOOGLE_BOOKS_API_KEY'))
+
+@admin.route('/books/<int:book_id>/delete', methods=['POST'])
+@login_required
+def book_delete(book_id):
+    book = Book.query.get_or_404(book_id)
+    db.session.delete(book)
+    db.session.commit()
+    flash('书籍已删除', 'success')
+    return redirect(url_for('admin.books'))
+
+
+@admin.route('/projects')
+@login_required
+def projects():
+    projects = Project.query.order_by(Project.created_at.desc()).all()
+    return render_template('admin/projects.html', projects=projects)
+
+@admin.route('/projects/new', methods=['GET', 'POST'])
+@login_required
+def project_new():
+    if request.method == 'POST':
+        project = Project(
+            title=request.form.get('title', '').strip(),
+            description=request.form.get('description', '').strip(),
+            url=request.form.get('url', '').strip() or None,
+            is_active=bool(request.form.get('is_active')),
+        )
+        db.session.add(project)
+        db.session.commit()
+        flash('项目已添加', 'success')
+        return redirect(url_for('admin.projects'))
+    return render_template('admin/project_form.html', project=None)
+
+@admin.route('/projects/<int:project_id>/edit', methods=['GET', 'POST'])
+@login_required
+def project_edit(project_id):
+    project = Project.query.get_or_404(project_id)
+    if request.method == 'POST':
+        project.title = request.form.get('title', '').strip()
+        project.description = request.form.get('description', '').strip()
+        project.url = request.form.get('url', '').strip() or None
+        project.is_active = bool(request.form.get('is_active'))
+        db.session.commit()
+        flash('项目已更新', 'success')
+        return redirect(url_for('admin.projects'))
+    return render_template('admin/project_form.html', project=project)
+
+@admin.route('/projects/<int:project_id>/delete', methods=['POST'])
+@login_required
+def project_delete(project_id):
+    project = Project.query.get_or_404(project_id)
+    db.session.delete(project)
+    db.session.commit()
+    flash('项目已删除', 'success')
+    return redirect(url_for('admin.projects'))
+
+@admin.route('/books/new', methods=['GET', 'POST'])
+@login_required
+def book_new():
+    if request.method == 'POST':
+        book = Book(
+            title=request.form.get('title', '').strip(),
+            author=request.form.get('author', '').strip(),
+            cover=request.form.get('cover', '').strip() or None,
+            url=request.form.get('url', '').strip() or None,
+            is_reading=bool(request.form.get('is_reading')),
+            note_article_id=request.form.get('note_article_id') or None,
+        )
+        db.session.add(book)
+        db.session.commit()
+        flash('书籍已添加', 'success')
+        return redirect(url_for('admin.books'))
+    articles = Article.query.filter_by(is_published=True).order_by(Article.created_at.desc()).all()
+    return render_template('admin/book_form.html', book=None,
+                           google_books_key=os.getenv('GOOGLE_BOOKS_API_KEY'),
+                           articles=articles)
+
+@admin.route('/books/<int:book_id>/edit', methods=['GET', 'POST'])
+@login_required
+def book_edit(book_id):
+    book = Book.query.get_or_404(book_id)
+    if request.method == 'POST':
+        book.title = request.form.get('title', '').strip()
+        book.author = request.form.get('author', '').strip()
+        book.cover = request.form.get('cover', '').strip() or None
+        book.url = request.form.get('url', '').strip() or None
+        book.is_reading = bool(request.form.get('is_reading'))
+        book.note_article_id = request.form.get('note_article_id') or None
+        db.session.commit()
+        flash('书籍已更新', 'success')
+        return redirect(url_for('admin.books'))
+    articles = Article.query.filter_by(is_published=True).order_by(Article.created_at.desc()).all()
+    return render_template('admin/book_form.html', book=book,
+                           google_books_key=os.getenv('GOOGLE_BOOKS_API_KEY'),
+                           articles=articles)

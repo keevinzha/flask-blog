@@ -10,6 +10,10 @@ from flask import jsonify, url_for
 from app.models import Article
 from app.models import Article, Category, Series
 from app import cache
+from app.models.about import Book, Project
+from sqlalchemy import func
+import json
+from datetime import datetime, timedelta
 
 main = Blueprint('main', __name__)
 
@@ -43,3 +47,36 @@ def search_data():
         for p in posts
     ]
     return jsonify(data)
+
+
+@main.route('/about')
+def about():
+    books = Book.query.filter_by(is_reading=True).all()
+    read_books = Book.query.filter_by(is_reading=False).order_by(Book.created_at.desc()).all()
+    projects = Project.query.filter_by(is_active=True).all()
+
+    articles = Article.query.filter_by(is_published=True) \
+        .order_by(Article.created_at.desc()).all()
+
+    one_year_ago = datetime.now() - timedelta(days=365)
+    heatmap_articles = Article.query.filter(
+        Article.is_published == True,
+        Article.created_at >= one_year_ago
+    ).all()
+
+    heatmap_data = {}
+    for a in heatmap_articles:
+        day = a.created_at.strftime('%Y-%m-%d')
+        heatmap_data[day] = heatmap_data.get(day, 0) + 1
+
+    return render_template('about.html',
+                           books=books,
+                           read_books=read_books,
+                           projects=projects,
+                           articles=articles,
+                           heatmap_data=json.dumps(heatmap_data))
+
+@main.route('/books')
+def read_books():
+    books = Book.query.filter_by(is_reading=False).order_by(Book.created_at.desc()).all()
+    return render_template('read_books.html', books=books)

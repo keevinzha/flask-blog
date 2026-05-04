@@ -12,6 +12,7 @@
 
   <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/book.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/highlight.css') }}">
   {% block extra_css %}{% endblock %}
 
   <script defer src="{{ url_for('static', filename='js/fuse.min.js') }}"></script>
@@ -22,6 +23,17 @@
     display: flex !important;
     flex-direction: column !important;
     min-height: 100vh !important;
+}
+.book-toc {
+    font-size: 0.875rem;
+}
+.book-toc-content {
+    padding: 1rem;
+    line-height: 1.8;
+}
+.book-toc nav ol,
+.book-toc nav ul {
+    padding-left: 1rem;
 }
 </style>
 </head>

@@ -14,7 +14,7 @@ from app.utils import render_markdown
 blog = Blueprint('blog', __name__)
 
 @blog.route('/')
-@cache.cached(timeout=300)
+@cache.cached(timeout=300, query_string=True)
 def index():
     page = request.args.get('page', 1, type=int)
     pagination = Article.query.filter_by(is_published=True)\
@@ -46,7 +46,7 @@ def article_detail(slug):
                            next_post=next_post)
 
 @blog.route('/category/<slug>')
-@cache.cached(timeout=300)
+@cache.cached(timeout=300, query_string=True)
 def category(slug):
     cat = Category.query.filter_by(slug=slug).first_or_404()
     page = request.args.get('page', 1, type=int)
@@ -59,7 +59,7 @@ def category(slug):
                            current_category=cat)
 
 @blog.route('/tag/<slug>')
-@cache.cached(timeout=300)
+@cache.cached(timeout=300, query_string=True)
 def tag(slug):
     t = Tag.query.filter_by(slug=slug).first_or_404()
     page = request.args.get('page', 1, type=int)
@@ -72,7 +72,7 @@ def tag(slug):
                            current_tag=t.name)
 
 @blog.route('/series/<slug>')
-@cache.cached(timeout=300)
+@cache.cached(timeout=300, query_string=True)
 def series(slug):
     s = Series.query.filter_by(slug=slug).first_or_404()
     page = request.args.get('page', 1, type=int)

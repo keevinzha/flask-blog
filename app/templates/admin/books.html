@@ -1,0 +1,37 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}书籍管理 – {{ site_title }}{% endblock %}
+{% block header_title %}书籍管理{% endblock %}
+{% block toc %}{% endblock %}
+{% block show_toc_icon %}{% endblock %}
+
+{% block content %}
+<div class="admin-toolbar">
+  <div class="admin-toolbar-end">
+    <a href="{{ url_for('admin.book_new') }}" class="btn btn-primary">添加书籍</a>
+  </div>
+</div>
+
+<table class="admin-table">
+  <thead>
+    <tr><th>书名</th><th>作者</th><th>状态</th><th>操作</th></tr>
+  </thead>
+  <tbody>
+    {% for book in books %}
+    <tr>
+      <td>{{ book.title }}</td>
+      <td>{{ book.author or '—' }}</td>
+      <td>{% if book.is_reading %}<span class="badge badge-published">在读</span>{% else %}<span class="badge badge-draft">已读</span>{% endif %}</td>
+      <td>
+        <a href="{{ url_for('admin.book_edit', book_id=book.id) }}" class="btn btn-secondary btn-sm">编辑</a>
+        <form method="post" action="{{ url_for('admin.book_delete', book_id=book.id) }}" style="display:inline" onsubmit="return confirm('确认删除？')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-danger btn-sm">删除</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" style="text-align:center;opacity:.5;padding:2rem 0">暂无书籍</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

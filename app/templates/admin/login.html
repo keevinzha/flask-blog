@@ -1,12 +1,81 @@
 <!DOCTYPE html>
-<html>
-<head><title>登录</title></head>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 – {{ site_title }}</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/book.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-box {
+      width: 100%;
+      max-width: 360px;
+      padding: 2.5rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--border-radius);
+      background: var(--body-background);
+    }
+    .login-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .login-box .form-group {
+      margin-bottom: 1rem;
+    }
+    .login-box .admin-input {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .login-box .btn {
+      width: 100%;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
 <body>
-<form method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="text" name="username" placeholder="用户名">
-    <input type="password" name="password" placeholder="密码">
-    <button type="submit">登录</button>
-</form>
+  <div class="login-container">
+    <div class="login-box">
+      <div class="login-title">{{ site_title }} 后台</div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="admin-flashes">
+          {% for category, message in messages %}
+          <li class="flash-{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+          <label for="username">用户名</label>
+          <input id="username" name="username" type="text"
+                 class="admin-input" placeholder="用户名" required autofocus>
+        </div>
+        <div class="form-group">
+          <label for="password">密码</label>
+          <input id="password" name="password" type="password"
+                 class="admin-input" placeholder="密码" required>
+        </div>
+        <button type="submit" class="btn btn-primary">登录</button>
+      </form>
+    </div>
+  </div>
 </body>
 </html>

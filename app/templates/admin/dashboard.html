@@ -1,13 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head><title>后台</title></head>
-<body>
-<h1>后台管理</h1>
-<p>文章总数: {{ article_count }}</p>
-<p>已发布: {{ published_count }}</p>
-<p>分类数: {{ category_count }}</p>
-<p>标签数: {{ tag_count }}</p>
-<a href="{{ url_for('admin.articles') }}">文章管理</a>
-<a href="{{ url_for('admin.logout') }}">退出</a>
-</body>
-</html>
+{% extends "admin/admin_base.html" %}
+{% block title %}仪表盘 – {{ site_title }}{% endblock %}
+{% block header_title %}仪表盘{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem">
+  <div style="padding:1.5rem;border:1px solid var(--gray-200);border-radius:var(--border-radius);text-align:center">
+    <div style="font-size:2rem;font-weight:700;color:var(--color-accent-default)">{{ article_count }}</div>
+    <div style="font-size:var(--font-size-smaller);opacity:.6;margin-top:0.25rem">文章总数</div>
+  </div>
+  <div style="padding:1.5rem;border:1px solid var(--gray-200);border-radius:var(--border-radius);text-align:center">
+    <div style="font-size:2rem;font-weight:700;color:var(--color-accent-tip)">{{ published_count }}</div>
+    <div style="font-size:var(--font-size-smaller);opacity:.6;margin-top:0.25rem">已发布</div>
+  </div>
+  <div style="padding:1.5rem;border:1px solid var(--gray-200);border-radius:var(--border-radius);text-align:center">
+    <div style="font-size:2rem;font-weight:700;color:var(--color-accent-note)">{{ category_count }}</div>
+    <div style="font-size:var(--font-size-smaller);opacity:.6;margin-top:0.25rem">分类数</div>
+  </div>
+  <div style="padding:1.5rem;border:1px solid var(--gray-200);border-radius:var(--border-radius);text-align:center">
+    <div style="font-size:2rem;font-weight:700;color:var(--color-accent-warning)">{{ tag_count }}</div>
+    <div style="font-size:var(--font-size-smaller);opacity:.6;margin-top:0.25rem">标签数</div>
+  </div>
+</div>
+
+<div class="admin-section">快捷操作</div>
+<div class="flex gap" style="margin-top:1rem">
+  <a href="{{ url_for('admin.article_new') }}" class="btn btn-primary">写文章</a>
+  <a href="{{ url_for('admin.articles') }}" class="btn btn-secondary">文章管理</a>
+  <a href="{{ url_for('admin.categories') }}" class="btn btn-secondary">分类管理</a>
+  <a href="{{ url_for('admin.tags') }}" class="btn btn-secondary">标签管理</a>
+  <a href="{{ url_for('main.index') }}" target="_blank" class="btn btn-secondary">查看博客</a>
+</div>
+{% endblock %}
