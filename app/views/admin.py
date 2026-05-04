@@ -194,6 +194,9 @@ def category_new():
         name = request.form.get('name', '').strip()
         slug = slugify(request.form.get('slug', '').strip() or name)
         description = request.form.get('description', '').strip()
+        if Category.query.filter_by(slug=slug).first():
+            flash('该slug已存在，请换一个', 'error')
+            return render_template('admin/category_form.html', category=None)
         category = Category(name=name, slug=slug, description=description)
         db.session.add(category)
         db.session.commit()
@@ -207,8 +210,14 @@ def category_new():
 def category_edit(category_id):
     category = Category.query.get_or_404(category_id)
     if request.method == 'POST':
-        category.name = request.form.get('name', '').strip()
-        category.slug = slugify(request.form.get('slug', '').strip() or category.name)
+        name = request.form.get('name', '').strip()
+        slug = slugify(request.form.get('slug', '').strip() or name)
+        existing = Category.query.filter_by(slug=slug).first()
+        if existing and existing.id != category_id:
+            flash('该slug已存在，请换一个', 'error')
+            return render_template('admin/category_form.html', category=category)
+        category.name = name
+        category.slug = slug
         category.description = request.form.get('description', '').strip()
         db.session.commit()
         cache.clear()
@@ -239,6 +248,9 @@ def tag_new():
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         slug = slugify(request.form.get('slug', '').strip() or name)
+        if Tag.query.filter_by(slug=slug).first():
+            flash('该slug已存在，请换一个', 'error')
+            return render_template('admin/tag_form.html', tag=None)
         tag = Tag(name=name, slug=slug)
         db.session.add(tag)
         db.session.commit()
@@ -252,8 +264,14 @@ def tag_new():
 def tag_edit(tag_id):
     tag = Tag.query.get_or_404(tag_id)
     if request.method == 'POST':
-        tag.name = request.form.get('name', '').strip()
-        tag.slug = slugify(request.form.get('slug', '').strip() or tag.name)
+        name = request.form.get('name', '').strip()
+        slug = slugify(request.form.get('slug', '').strip() or name)
+        existing = Tag.query.filter_by(slug=slug).first()
+        if existing and existing.id != tag_id:
+            flash('该slug已存在，请换一个', 'error')
+            return render_template('admin/tag_form.html', tag=tag)
+        tag.name = name
+        tag.slug = slug
         db.session.commit()
         cache.clear()
         flash('标签已更新', 'success')
@@ -285,6 +303,9 @@ def series_new():
         title = request.form.get('title', '').strip()
         slug = slugify(request.form.get('slug', '').strip() or title)
         description = request.form.get('description', '').strip()
+        if Series.query.filter_by(slug=slug).first():
+            flash('该slug已存在，请换一个', 'error')
+            return render_template('admin/series_form.html', series=None)
         s = Series(title=title, slug=slug, description=description)
         db.session.add(s)
         db.session.commit()
@@ -298,8 +319,14 @@ def series_new():
 def series_edit(series_id):
     series = Series.query.get_or_404(series_id)
     if request.method == 'POST':
-        series.title = request.form.get('title', '').strip()
-        series.slug = slugify(request.form.get('slug', '').strip() or series.title)
+        title = request.form.get('title', '').strip()
+        slug = slugify(request.form.get('slug', '').strip() or title)
+        existing = Series.query.filter_by(slug=slug).first()
+        if existing and existing.id != series_id:
+            flash('该slug已存在，请换一个', 'error')
+            return render_template('admin/series_form.html', series=series)
+        series.title = title
+        series.slug = slug
         series.description = request.form.get('description', '').strip()
         db.session.commit()
         cache.clear()
