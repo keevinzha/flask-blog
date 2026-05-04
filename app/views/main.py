@@ -5,13 +5,10 @@
 @File ：main.py
 @IDE ：PyCharm
 """
-from flask import Blueprint, render_template
-from flask import jsonify, url_for
-from app.models import Article
-from app.models import Article, Category, Series
+from flask import Blueprint, render_template, jsonify, url_for
+from app.models import Article, Category, Tag, Series
 from app import cache
 from app.models.about import Book, Project
-from sqlalchemy import func
 import json
 from datetime import datetime, timedelta
 
@@ -27,12 +24,14 @@ def index():
     ).order_by(Article.created_at.desc()).limit(10).all()
 
     categories = Category.query.all()
+    tags = Tag.query.all()
 
     return render_template('post_list.html',
                            posts=recent,
                            pagination=None,
                            all_categories=categories,
-                           all_tags=[])
+                           all_tags=tags)
+
 
 @main.route('/search-data.json')
 def search_data():
@@ -55,12 +54,12 @@ def about():
     read_books = Book.query.filter_by(is_reading=False).order_by(Book.created_at.desc()).all()
     projects = Project.query.filter_by(is_active=True).all()
 
-    articles = Article.query.filter_by(is_published=True) \
+    articles = Article.query.filter_by(is_published=True)\
         .order_by(Article.created_at.desc()).all()
 
     one_year_ago = datetime.now() - timedelta(days=365)
     heatmap_articles = Article.query.filter(
-        Article.is_published == True,
+        Article.is_published==True,
         Article.created_at >= one_year_ago
     ).all()
 
@@ -75,6 +74,7 @@ def about():
                            projects=projects,
                            articles=articles,
                            heatmap_data=json.dumps(heatmap_data))
+
 
 @main.route('/books')
 def read_books():

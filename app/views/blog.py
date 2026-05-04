@@ -13,6 +13,11 @@ from app.utils import render_markdown
 
 blog = Blueprint('blog', __name__)
 
+
+def get_sidebar():
+    return Category.query.all(), Tag.query.all()
+
+
 @blog.route('/')
 @cache.cached(timeout=300, query_string=True)
 def index():
@@ -20,9 +25,13 @@ def index():
     pagination = Article.query.filter_by(is_published=True)\
         .order_by(Article.created_at.desc())\
         .paginate(page=page, per_page=10)
+    categories, tags = get_sidebar()
     return render_template('post_list.html',
                            posts=pagination.items,
-                           pagination=pagination)
+                           pagination=pagination,
+                           all_categories=categories,
+                           all_tags=tags)
+
 
 @blog.route('/<slug>')
 def article_detail(slug):
@@ -38,12 +47,16 @@ def article_detail(slug):
         Article.is_published==True,
         Article.created_at > article.created_at
     ).order_by(Article.created_at.asc()).first()
+    categories, tags = get_sidebar()
     return render_template('post_detail.html',
                            post=article,
                            content_html=content_html,
                            toc_html=toc_html,
                            prev_post=prev_post,
-                           next_post=next_post)
+                           next_post=next_post,
+                           all_categories=categories,
+                           all_tags=tags)
+
 
 @blog.route('/category/<slug>')
 @cache.cached(timeout=300, query_string=True)
@@ -53,10 +66,14 @@ def category(slug):
     pagination = cat.articles.filter_by(is_published=True)\
         .order_by(Article.created_at.desc())\
         .paginate(page=page, per_page=10)
+    categories, tags = get_sidebar()
     return render_template('post_list.html',
                            posts=pagination.items,
                            pagination=pagination,
+                           all_categories=categories,
+                           all_tags=tags,
                            current_category=cat)
+
 
 @blog.route('/tag/<slug>')
 @cache.cached(timeout=300, query_string=True)
@@ -66,10 +83,14 @@ def tag(slug):
     pagination = t.articles.filter_by(is_published=True)\
         .order_by(Article.created_at.desc())\
         .paginate(page=page, per_page=10)
+    categories, tags = get_sidebar()
     return render_template('post_list.html',
                            posts=pagination.items,
                            pagination=pagination,
+                           all_categories=categories,
+                           all_tags=tags,
                            current_tag=t.name)
+
 
 @blog.route('/series/<slug>')
 @cache.cached(timeout=300, query_string=True)
@@ -79,7 +100,10 @@ def series(slug):
     pagination = s.articles.filter_by(is_published=True)\
         .order_by(Article.series_order.asc())\
         .paginate(page=page, per_page=10)
+    categories, tags = get_sidebar()
     return render_template('post_list.html',
                            posts=pagination.items,
                            pagination=pagination,
+                           all_categories=categories,
+                           all_tags=tags,
                            current_series=s)

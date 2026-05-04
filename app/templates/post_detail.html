@@ -13,6 +13,40 @@
 {% if toc_html %}
 {{ toc_html | safe }}
 {% endif %}
+
+{% if all_tags %}
+<nav>
+  <ul>
+    <li class="book-section-flat">
+      <span>标签</span>
+      <ul>
+        {% for tag in all_tags %}
+        <li class="flex align-center">
+          <a href="{{ url_for('blog.tag', slug=tag.slug) }}">{{ tag.name }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
+  </ul>
+</nav>
+{% endif %}
+
+{% if all_categories %}
+<nav>
+  <ul>
+    <li class="book-section-flat">
+      <span>分类</span>
+      <ul>
+        {% for cat in all_categories %}
+        <li class="flex align-center">
+          <a href="{{ url_for('blog.category', slug=cat.slug) }}">{{ cat.name }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
+  </ul>
+</nav>
+{% endif %}
 {% endblock %}
 
 {% block content %}
