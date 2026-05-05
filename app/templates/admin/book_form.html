@@ -50,13 +50,26 @@
   </div>
 
 <div class="form-group">
-  <label>关联读书笔记</label>
+  <label>关联读书笔记专题</label>
   <select name="note_series_id" class="admin-select" style="width:100%">
     <option value="">— 无 —</option>
     {% for s in series_list %}
     <option value="{{ s.id }}"
       {% if is_edit and book.note_series_id == s.id %}selected{% endif %}>
       {{ s.title }}
+    </option>
+    {% endfor %}
+  </select>
+</div>
+
+<div class="form-group">
+  <label>关联读书笔记文章</label>
+  <select name="note_article_id" class="admin-select" style="width:100%">
+    <option value="">— 无 —</option>
+    {% for article in articles %}
+    <option value="{{ article.id }}"
+      {% if is_edit and book.note_article_id == article.id %}selected{% endif %}>
+      {{ article.title }}
     </option>
     {% endfor %}
   </select>

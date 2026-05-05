@@ -362,15 +362,18 @@ def book_new():
             url=request.form.get('url', '').strip() or None,
             is_reading=bool(request.form.get('is_reading')),
             note_series_id=request.form.get('note_series_id') or None,
+            note_article_id=request.form.get('note_article_id') or None,
         )
         db.session.add(book)
         db.session.commit()
         flash('书籍已添加', 'success')
         return redirect(url_for('admin.books'))
     series_list = Series.query.order_by(Series.title).all()
+    articles = Article.query.filter_by(is_published=True).order_by(Article.created_at.desc()).all()
     return render_template('admin/book_form.html', book=None,
                            google_books_key=os.getenv('GOOGLE_BOOKS_API_KEY'),
-                           series_list=series_list)
+                           series_list=series_list,
+                           articles=articles)
 
 @admin.route('/books/<int:book_id>/edit', methods=['GET', 'POST'])
 @login_required
@@ -383,13 +386,16 @@ def book_edit(book_id):
         book.url = request.form.get('url', '').strip() or None
         book.is_reading = bool(request.form.get('is_reading'))
         book.note_series_id = request.form.get('note_series_id') or None
+        book.note_article_id = request.form.get('note_article_id') or None
         db.session.commit()
         flash('书籍已更新', 'success')
         return redirect(url_for('admin.books'))
     series_list = Series.query.order_by(Series.title).all()
+    articles = Article.query.filter_by(is_published=True).order_by(Article.created_at.desc()).all()
     return render_template('admin/book_form.html', book=book,
                            google_books_key=os.getenv('GOOGLE_BOOKS_API_KEY'),
-                           series_list=series_list)
+                           series_list=series_list,
+                           articles=articles)
 
 @admin.route('/books/<int:book_id>/delete', methods=['POST'])
 @login_required

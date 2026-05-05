@@ -27,10 +27,14 @@
                                     {% if book.note_series %}
                                         <a href="{{ url_for('blog.series', slug=book.note_series.slug) }}"
                                            class="book-item">
+                                    {% elif book.note_article %}
+                                        <a href="{{ url_for('blog.article_detail', slug=book.note_article.slug) }}"
+                                           class="book-item">
                                     {% elif book.url %}
                                         <a href="{{ book.url }}" target="_blank" rel="noopener" class="book-item">
                                     {% else %}
-                                        <div class="book-item">{% endif %}
+                                        <div class="book-item">
+                                    {% endif %}
                                     {% if book.cover %}
                                         <img src="{{ book.cover }}" alt="{{ book.title }}" class="book-cover">
                                     {% else %}
@@ -48,7 +52,8 @@
                                         {% if book.author %}
                                             <div class="book-author">{{ book.author }}</div>{% endif %}
                                     </div>
-                                    {% if book.note_series or book.url %}</a>{% else %}</div>{% endif %}
+                                    {% if book.note_series or book.note_article or book.url %}</a>{% else %}</div>
+                                    {% endif %}
                                 </li>
                             {% endfor %}
                         </ul>
