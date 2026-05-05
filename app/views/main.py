@@ -9,7 +9,6 @@ from flask import Blueprint, render_template, jsonify, url_for
 from app.models import Article, Category, Tag, Series
 from app import cache
 from app.models.about import Book, Project
-import json
 from datetime import datetime, timedelta
 
 main = Blueprint('main', __name__)
@@ -59,21 +58,25 @@ def about():
 
     one_year_ago = datetime.now() - timedelta(days=365)
     heatmap_articles = Article.query.filter(
-        Article.is_published==True,
-        Article.created_at >= one_year_ago
+        Article.is_published == True,
+        Article.updated_at >= one_year_ago
     ).all()
 
     heatmap_data = {}
     for a in heatmap_articles:
-        day = a.created_at.strftime('%Y-%m-%d')
-        heatmap_data[day] = heatmap_data.get(day, 0) + 1
+        # 同一篇文章在同一天只计一次，创建和最后修改各贡献一个点
+        days = {a.created_at.strftime('%Y-%m-%d')}
+        if a.updated_at:
+            days.add(a.updated_at.strftime('%Y-%m-%d'))
+        for day in days:
+            heatmap_data[day] = heatmap_data.get(day, 0) + 1
 
     return render_template('about.html',
                            books=books,
                            read_books=read_books,
                            projects=projects,
                            articles=articles,
-                           heatmap_data=json.dumps(heatmap_data))
+                           heatmap_data=heatmap_data)
 
 
 @main.route('/books')

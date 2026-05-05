@@ -311,11 +311,11 @@ a .book-icon { height: 1em; width: 1em; }
 
 /* ── Right TOC ── */
 .book-toc {
-  flex: 0 0 16rem;
+  flex: 0 0 18rem;
   font-size: var(--font-size-smallest);
 }
 .book-toc .book-toc-content {
-  width: 16rem;
+  width: 18rem;
   padding: 1rem;
   position: fixed;
   top: 0; bottom: 0;

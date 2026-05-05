@@ -33,11 +33,19 @@
   .book-toc-content {
       padding: 1rem;
       line-height: 1.8;
+      scrollbar-width: none; /* Firefox */
+  }
+  .book-toc-content::-webkit-scrollbar {
+      display: none; /* Chrome / Safari */
   }
   .book-toc nav ol,
   .book-toc nav ul {
       padding-left: 1rem;
   }
+  .book-toc .toc ul {
+      padding-left: 0.65rem;
+  }
+
   </style>
 </head>
 <body>
