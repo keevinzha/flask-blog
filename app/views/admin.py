@@ -10,6 +10,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db, cache
 from app.models import User, Article, Category, Tag, Series
+from app.models.article_activity import ArticleActivity
 from app.models.about import Book, Project
 from slugify import slugify
 
@@ -176,6 +177,8 @@ def _save_article(article):
         article.series_id = series_id
 
     article.tags = tags
+    db.session.flush()  # 确保 article.id 已生成（新文章）
+    ArticleActivity.record(article.id)
     db.session.commit()
     cache.clear()
     flash('文章已保存', 'success')

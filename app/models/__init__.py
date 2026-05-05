@@ -4,3 +4,4 @@ from app.models.tag import Tag, article_tags
 from app.models.series import Series
 from app.models.article import Article
 from app.models.about import Book, Project
+from app.models.article_activity import ArticleActivity

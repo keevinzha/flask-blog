@@ -7,9 +7,10 @@
 """
 from flask import Blueprint, render_template, jsonify, url_for
 from app.models import Article, Category, Tag, Series
-from app import cache
+from app import db, cache
 from app.models.about import Book, Project
-from datetime import datetime, timedelta
+from app.models.article_activity import ArticleActivity
+from datetime import datetime, timedelta, date
 
 main = Blueprint('main', __name__)
 
@@ -56,20 +57,15 @@ def about():
     articles = Article.query.filter_by(is_published=True)\
         .order_by(Article.created_at.desc()).all()
 
-    one_year_ago = datetime.now() - timedelta(days=365)
-    heatmap_articles = Article.query.filter(
-        Article.is_published == True,
-        Article.updated_at >= one_year_ago
-    ).all()
+    one_year_ago = date.today() - timedelta(days=365)
+    activities = db.session.query(
+        ArticleActivity.date,
+        db.func.count(ArticleActivity.article_id)
+    ).join(Article, Article.id == ArticleActivity.article_id)\
+     .filter(Article.is_published == True, ArticleActivity.date >= one_year_ago)\
+     .group_by(ArticleActivity.date).all()
 
-    heatmap_data = {}
-    for a in heatmap_articles:
-        # 同一篇文章在同一天只计一次，创建和最后修改各贡献一个点
-        days = {a.created_at.strftime('%Y-%m-%d')}
-        if a.updated_at:
-            days.add(a.updated_at.strftime('%Y-%m-%d'))
-        for day in days:
-            heatmap_data[day] = heatmap_data.get(day, 0) + 1
+    heatmap_data = {str(d): cnt for d, cnt in activities}
 
     return render_template('about.html',
                            books=books,
