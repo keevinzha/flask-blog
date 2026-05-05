@@ -82,9 +82,8 @@
         {% if books %}
             <div class="bookshelf">
                 {% for book in books %}
-                    {% if book.note_article %}
-                        <a href="{{ url_for('blog.article_detail', slug=book.note_article.slug) }}"
-                           class="bookshelf-item">
+                    {% if book.note_series %}
+                        <a href="{{ url_for('blog.series', slug=book.note_series.slug) }}" class="bookshelf-item">
                     {% else %}
                         <div class="bookshelf-item">
                     {% endif %}

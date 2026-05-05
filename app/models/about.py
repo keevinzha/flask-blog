@@ -15,8 +15,8 @@ class Book(db.Model):
     author = db.Column(db.String(64))
     cover = db.Column(db.String(256))
     url = db.Column(db.String(256))
-    note_article_id = db.Column(db.Integer, db.ForeignKey('articles.id'), nullable=True)
-    note_article = db.relationship('Article', backref='book', foreign_keys=[note_article_id])
+    note_series_id = db.Column(db.Integer, db.ForeignKey('series.id'), nullable=True)
+    note_series = db.relationship('Series', backref='book', foreign_keys=[note_series_id])
     is_reading = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
 

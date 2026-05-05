@@ -7,142 +7,151 @@
 {% block show_toc_icon %}{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="markdown about-wrapper">
+    <div class="markdown about-wrapper">
 
-  {# ── Section 1: Books & Projects ── #}
-  <section class="about-section">
-    <div class="about-grid">
+        {# ── Section 1: Books & Projects ── #}
+        <section class="about-section">
+            <div class="about-grid">
 
-      {# Left: 正在读 + 已读链接 #}
-      <div>
-        <h2>正在读</h2>
-        {% if books %}
-          <ul class="book-list">
-            {% for book in books %}
-            <li>
-              {% if book.url %}<a href="{{ book.url }}" target="_blank" rel="noopener" class="book-item">
-              {% else %}<div class="book-item">{% endif %}
-                {% if book.cover %}
-                  <img src="{{ book.cover }}" alt="{{ book.title }}" class="book-cover">
+                {# Left: 正在读 + 已读链接 #}
+                <div>
+                    <h2>正在读</h2>
+                    {% if books %}
+                        <ul class="book-list">
+                            {% for book in books %}
+                                <li>
+                                    {% if book.note_series %}
+                                        <a href="{{ url_for('blog.series', slug=book.note_series.slug) }}"
+                                           class="book-item">
+                                    {% elif book.url %}
+                                        <a href="{{ book.url }}" target="_blank" rel="noopener" class="book-item">
+                                    {% else %}
+                                        <div class="book-item">{% endif %}
+                                    {% if book.cover %}
+                                        <img src="{{ book.cover }}" alt="{{ book.title }}" class="book-cover">
+                                    {% else %}
+                                        <div class="book-cover-placeholder">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                 viewBox="0 0 24 24"
+                                                 fill="none" stroke="currentColor" stroke-width="1.5">
+                                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                            </svg>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <div class="book-title">{{ book.title }}</div>
+                                        {% if book.author %}
+                                            <div class="book-author">{{ book.author }}</div>{% endif %}
+                                    </div>
+                                    {% if book.note_series or book.url %}</a>{% else %}</div>{% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="about-empty">暂无在读书籍</p>
+                    {% endif %}
+
+                {% if read_books %}
+                    <a href="{{ url_for('main.read_books') }}"
+                       style="font-size:var(--font-size-smaller);margin-top:0.75rem;display:inline-block">
+                        查看已读书单 ({{ read_books|length }}) →
+                    </a>
+                {% endif %}
+            </div>
+
+            {# Right: 正在做 #}
+            <div>
+                <h2>正在做</h2>
+                {% if projects %}
+                    <ul class="project-list">
+                        {% for project in projects %}
+                            <li class="project-item">
+                                <div class="project-item-inner">
+                                    <div>
+                                        <div class="project-title">{{ project.title }}</div>
+                                        {% if project.description %}
+                                            <div class="project-desc">{{ project.description }}</div>
+                                        {% endif %}
+                                    </div>
+                                    {% if project.url %}
+                                        <a href="{{ project.url }}" target="_blank" rel="noopener" class="project-link">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                 viewBox="0 0 24 24"
+                                                 fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                                <polyline points="15 3 21 3 21 9"/>
+                                                <line x1="10" y1="14" x2="21" y2="3"/>
+                                            </svg>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 {% else %}
-                  <div class="book-cover-placeholder">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="1.5">
-                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                    </svg>
-                  </div>
+                    <p class="about-empty">暂无进行中的项目</p>
                 {% endif %}
-                <div>
-                  <div class="book-title">{{ book.title }}</div>
-                  {% if book.author %}<div class="book-author">{{ book.author }}</div>{% endif %}
-                </div>
-              {% if book.url %}</a>{% else %}</div>{% endif %}
-            </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="about-empty">暂无在读书籍</p>
-        {% endif %}
-
-        {% if read_books %}
-        <a href="{{ url_for('main.read_books') }}" style="font-size:var(--font-size-smaller);margin-top:0.75rem;display:inline-block">
-          查看已读书单 ({{ read_books|length }}) →
-        </a>
-        {% endif %}
-      </div>
-
-      {# Right: 正在做 #}
-      <div>
-        <h2>正在做</h2>
-        {% if projects %}
-          <ul class="project-list">
-            {% for project in projects %}
-            <li class="project-item">
-              <div class="project-item-inner">
-                <div>
-                  <div class="project-title">{{ project.title }}</div>
-                  {% if project.description %}
-                    <div class="project-desc">{{ project.description }}</div>
-                  {% endif %}
-                </div>
-                {% if project.url %}
-                  <a href="{{ project.url }}" target="_blank" rel="noopener" class="project-link">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                      <polyline points="15 3 21 3 21 9"/>
-                      <line x1="10" y1="14" x2="21" y2="3"/>
-                    </svg>
-                  </a>
-                {% endif %}
-              </div>
-            </li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p class="about-empty">暂无进行中的项目</p>
-        {% endif %}
-      </div>
+            </div>
 
     </div>
-  </section>
+    </section>
 
-  {# ── Section 2: Activity Heatmap ── #}
-  <section class="about-section">
-    <h2>文章热度</h2>
-    <div class="heatmap-scroll">
-      <svg id="heatmap-svg"></svg>
+    {# ── Section 2: Activity Heatmap ── #}
+    <section class="about-section">
+        <h2>文章热度</h2>
+        <div class="heatmap-scroll">
+            <svg id="heatmap-svg"></svg>
+        </div>
+        <div id="heatmap-tooltip"></div>
+    </section>
+
+    {# ── Section 3: Article Timeline ── #}
+    <section class="about-section">
+        <h2>文章归档</h2>
+        {% if articles %}
+            {% set ns = namespace(cur_year=None, cur_month=None) %}
+            {% for article in articles | sort(attribute='created_at', reverse=True) %}
+                {% set y = article.created_at.year %}
+                {% set m = article.created_at.month %}
+
+                {% if y != ns.cur_year %}
+                    {% if ns.cur_year is not none %}</ul></div>{% endif %}
+                    <h3 class="timeline-year">{{ y }}</h3>
+                    {% set ns.cur_year = y %}
+                    {% set ns.cur_month = None %}
+                {% endif %}
+
+                {% if m != ns.cur_month %}
+                    {% if ns.cur_month is not none %}</ul></div>{% endif %}
+                    <div class="timeline-month">
+                    <div class="timeline-month-label">{{ '%02d'|format(m) }}月</div>
+                    <ul class="timeline-articles">
+                    {% set ns.cur_month = m %}
+                {% endif %}
+
+                <li class="timeline-article">
+                    <a href="{{ url_for('blog.article_detail', slug=article.slug) }}">{{ article.title }}</a>
+                    <span class="timeline-article-date">{{ article.created_at.strftime('%m-%d') }}</span>
+                </li>
+
+            {% else %}
+                <p class="about-empty">暂无文章</p>
+            {% endfor %}
+        {% if ns.cur_month is not none %}</ul></div>{% endif %}
+        {% else %}
+            <p class="about-empty">暂无文章</p>
+        {% endif %}
+    </section>
+
     </div>
-    <div id="heatmap-tooltip"></div>
-  </section>
-
-  {# ── Section 3: Article Timeline ── #}
-  <section class="about-section">
-    <h2>文章归档</h2>
-    {% if articles %}
-      {% set ns = namespace(cur_year=None, cur_month=None) %}
-      {% for article in articles | sort(attribute='created_at', reverse=True) %}
-        {% set y = article.created_at.year %}
-        {% set m = article.created_at.month %}
-
-        {% if y != ns.cur_year %}
-          {% if ns.cur_year is not none %}</ul></div>{% endif %}
-          <h3 class="timeline-year">{{ y }}</h3>
-          {% set ns.cur_year = y %}
-          {% set ns.cur_month = None %}
-        {% endif %}
-
-        {% if m != ns.cur_month %}
-          {% if ns.cur_month is not none %}</ul></div>{% endif %}
-          <div class="timeline-month">
-          <div class="timeline-month-label">{{ '%02d'|format(m) }}月</div>
-          <ul class="timeline-articles">
-          {% set ns.cur_month = m %}
-        {% endif %}
-
-        <li class="timeline-article">
-          <a href="{{ url_for('blog.article_detail', slug=article.slug) }}">{{ article.title }}</a>
-          <span class="timeline-article-date">{{ article.created_at.strftime('%m-%d') }}</span>
-        </li>
-
-      {% else %}
-        <p class="about-empty">暂无文章</p>
-      {% endfor %}
-      {% if ns.cur_month is not none %}</ul></div>{% endif %}
-    {% else %}
-      <p class="about-empty">暂无文章</p>
-    {% endif %}
-  </section>
-
-</div>
 {% endblock %}
 
 {% block extra_js %}
-<script>window.HEATMAP_DATA = {{ heatmap_data | default('{}') | tojson }};</script>
-<script src="{{ url_for('static', filename='js/heatmap.js') }}"></script>
+    <script>window.HEATMAP_DATA = {{ heatmap_data | default('{}') | tojson }};</script>
+    <script src="{{ url_for('static', filename='js/heatmap.js') }}"></script>
 {% endblock %}
