@@ -46,11 +46,13 @@ def dashboard():
     published_count = Article.query.filter_by(is_published=True).count()
     category_count = Category.query.count()
     tag_count = Tag.query.count()
+    today_views = ArticleActivity.today_total()
     return render_template('admin/dashboard.html',
                            article_count=article_count,
                            published_count=published_count,
                            category_count=category_count,
-                           tag_count=tag_count)
+                           tag_count=tag_count,
+                           today_views=today_views)
 
 
 @admin.route('/articles')

@@ -8,6 +8,7 @@
 from flask import Blueprint, render_template, request
 from app import db
 from app.models import Article, Category, Tag, Series
+from app.models.article_activity import ArticleActivity
 from app import cache
 from app.utils import render_markdown
 
@@ -37,6 +38,7 @@ def index():
 def article_detail(slug):
     article = Article.query.filter_by(slug=slug, is_published=True).first_or_404()
     article.view_count += 1
+    ArticleActivity.record(article.id)
     db.session.commit()
     content_html, toc_html = render_markdown(article.content)
     prev_post = Article.query.filter(
