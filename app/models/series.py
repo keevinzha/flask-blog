@@ -15,6 +15,7 @@ class Series(db.Model):
     slug = db.Column(db.String(128), unique=True, nullable=False)
     description = db.Column(db.Text)
     cover = db.Column(db.String(256))
+    theme = db.Column(db.String(64), nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
 
     articles = db.relationship('Article', backref='series', lazy='dynamic',

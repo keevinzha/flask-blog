@@ -141,6 +141,7 @@ def _save_article(article):
     is_published = action == 'publish'
     is_recommended = bool(request.form.get('featured'))
     series_id = request.form.get('series') or None
+    theme = request.form.get('theme', '').strip() or None
 
     # 处理分类
     cat_name = request.form.get('category', '').strip()
@@ -166,6 +167,7 @@ def _save_article(article):
             is_recommended=is_recommended,
             category_id=category.id if category else None,
             series_id=series_id,
+            theme=theme,
         )
         db.session.add(article)
     else:
@@ -177,6 +179,7 @@ def _save_article(article):
         article.is_recommended = is_recommended
         article.category_id = category.id if category else None
         article.series_id = series_id
+        article.theme = theme
 
     article.tags = tags
     db.session.flush()  # 确保 article.id 已生成（新文章）
@@ -311,7 +314,8 @@ def series_new():
         if Series.query.filter_by(slug=slug).first():
             flash('该slug已存在，请换一个', 'error')
             return render_template('admin/series_form.html', series=None)
-        s = Series(title=title, slug=slug, description=description)
+        s_theme = request.form.get('theme', '').strip() or None
+        s = Series(title=title, slug=slug, description=description, theme=s_theme)
         db.session.add(s)
         db.session.commit()
         cache.clear()
@@ -333,6 +337,7 @@ def series_edit(series_id):
         series.title = title
         series.slug = slug
         series.description = request.form.get('description', '').strip()
+        series.theme = request.form.get('theme', '').strip() or None
         db.session.commit()
         cache.clear()
         flash('专题已更新', 'success')

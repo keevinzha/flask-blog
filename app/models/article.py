@@ -25,5 +25,6 @@ class Article(db.Model):
     series_order = db.Column(db.Integer, nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+    theme = db.Column(db.String(64), nullable=True)
 
     tags = db.relationship('Tag', secondary=article_tags, backref=db.backref('articles', lazy='dynamic'))

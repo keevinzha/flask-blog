@@ -134,6 +134,20 @@
     <span class="form-hint">多个标签用英文逗号分隔</span>
   </div>
 
+  <div class="admin-section">外观主题</div>
+
+  <div class="form-group">
+    <label for="theme">页面主题</label>
+    <select id="theme" name="theme" class="admin-select" style="width:100%">
+      <option value="">— 默认风格 —</option>
+      <option value="intelligent_investor"
+        {% if is_edit and article.theme == 'intelligent_investor' %}selected{% endif %}>
+        聪明的投资者 · 棕金风格
+      </option>
+    </select>
+    <span class="form-hint">选择后该文章将使用特定主题渲染，留空使用默认样式</span>
+  </div>
+
   <div class="admin-section">正文（Markdown）</div>
 
   <div class="form-group">

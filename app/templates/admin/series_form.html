@@ -35,6 +35,18 @@
     >{{ series.description if is_edit else '' }}</textarea>
   </div>
 
+  <div class="form-group">
+    <label for="theme">页面主题</label>
+    <select id="theme" name="theme" class="admin-select" style="width:100%">
+      <option value="">— 默认风格 —</option>
+      <option value="intelligent_investor"
+        {% if is_edit and series.theme == 'intelligent_investor' %}selected{% endif %}>
+        聪明的投资者 · 棕金风格
+      </option>
+    </select>
+    <span class="form-hint">专题下所有未单独设置主题的文章将继承此设置</span>
+  </div>
+
   <div class="flex gap" style="margin-top:1.5rem">
     <button type="submit" class="btn btn-primary">{{ '保存' if is_edit else '创建' }}</button>
     <a href="{{ url_for('admin.series_list') }}" class="btn btn-secondary">取消</a>
