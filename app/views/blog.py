@@ -50,7 +50,12 @@ def article_detail(slug):
         Article.created_at > article.created_at
     ).order_by(Article.created_at.asc()).first()
     categories, tags = get_sidebar()
-    return render_template('post_detail.html',
+    theme = article.theme or (article.series.theme if article.series else None)
+    theme_templates = {
+        'intelligent_investor': 'post_detail_intelligent_investor.html',
+    }
+    template = theme_templates.get(theme, 'post_detail.html')
+    return render_template(template,
                            post=article,
                            content_html=content_html,
                            toc_html=toc_html,
