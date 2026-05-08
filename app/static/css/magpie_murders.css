@@ -1,0 +1,145 @@
+:root {
+  --red: #c8102e;
+  --red-dark: #8b0a1e;
+  --black: #0a0a0a;
+  --off-white: #f5f0e8;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background: var(--black);
+  color: var(--off-white);
+  font-family: 'IM Fell English', serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+.cursor {
+  position:fixed; width:10px; height:10px;
+  background:white; border-radius:50%;
+  pointer-events:none; z-index:9999;
+  transform:translate(-50%,-50%);
+  mix-blend-mode:difference;
+}
+.cursor-ring {
+  position:fixed; width:34px; height:34px;
+  border:1px solid rgba(255,255,255,0.4); border-radius:50%;
+  pointer-events:none; z-index:9998;
+  transform:translate(-50%,-50%);
+  transition: left 0.12s ease, top 0.12s ease;
+}
+
+/* ===== HERO ===== */
+#hero {
+  position:relative;
+  width:100vw; height:100vh;
+  overflow:hidden;
+  background: linear-gradient(to right, var(--black) 50%, var(--red) 50%);
+}
+
+/* ===== TITLE ===== */
+.title-wrap {
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-58%);
+  z-index:30; pointer-events:none;
+  width: clamp(320px, 60vw, 720px);
+}
+.title-wrap .t-line {
+  display:block;
+  font-family:'Bebas Neue','Playfair Display',serif;
+  font-size: clamp(3.8rem,10vw,9.5rem);
+  letter-spacing:0.12em; line-height:0.9; color:white;
+}
+.t-line-1 { text-align:left;  padding-left:0; }
+.t-line-2 { text-align:right; padding-right:0; }
+
+.t-line .letter {
+  display:inline-block;
+  opacity:0;
+  transform:translateY(18px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.t-line .letter.visible {
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* ===== SUBTITLE ===== */
+.hero-subtitle {
+  position:absolute; bottom:clamp(4rem,9vh,6rem);
+  left:50%; transform:translateX(-50%); z-index:30;
+  display:flex; align-items:center; gap:1rem;
+  font-family:'IM Fell English',serif; font-size:clamp(0.7rem,1.4vw,0.9rem);
+  font-style:italic; color:white; letter-spacing:0.1em; white-space:nowrap;
+  opacity:0; transition:opacity 0.8s 1.8s ease;
+}
+#hero.ready .hero-subtitle { opacity:0.7; }
+.sub-dot { color:rgba(255,255,255,0.35); font-style:normal; }
+
+/* ===== SCROLL HINT ===== */
+.scroll-hint {
+  position:absolute; bottom:1.5rem; left:50%;
+  transform:translateX(-50%); z-index:30;
+  display:flex; flex-direction:column; align-items:center; gap:0.4rem;
+  opacity:0; transition:opacity 0.8s 2.3s ease;
+}
+#hero.ready .scroll-hint { opacity:1; }
+.scroll-hint span { font-size:0.6rem; letter-spacing:0.38em; text-transform:uppercase; color:rgba(255,255,255,0.35); }
+.scroll-line {
+  width:1px; height:38px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0.4),transparent);
+  animation:spulse 2s ease infinite;
+}
+@keyframes spulse {
+  0%,100%{ opacity:1; transform:scaleY(1); }
+  50%    { opacity:0.3; transform:scaleY(0.6); }
+}
+
+/* ===== CONTENT ===== */
+#content { background:var(--black); position:relative; }
+.container { max-width:780px; margin:0 auto; padding:0 2rem; }
+
+.chapter-divider { display:flex; align-items:center; padding:4rem 0 3rem; }
+.chapter-divider::before { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--red-dark)); margin-right:1.5rem; }
+.chapter-divider::after  { content:''; flex:1; height:1px; background:linear-gradient(to left,transparent,var(--red-dark)); margin-left:1.5rem; }
+.chapter-num { font-family:'Playfair Display',serif; font-size:0.7rem; letter-spacing:0.4em; text-transform:uppercase; color:var(--red); white-space:nowrap; }
+
+.book-card { position:relative; background:rgba(200,16,46,0.04); border:1px solid rgba(200,16,46,0.2); border-left:3px solid var(--red); padding:2.5rem 3rem; margin:0 0 4rem; overflow:hidden; }
+.book-card::before { content:'❝'; position:absolute; top:-0.5rem; left:1rem; font-size:6rem; color:rgba(200,16,46,0.06); font-family:serif; line-height:1; }
+.book-meta { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1.5rem; }
+.book-meta-item label { display:block; font-family:'Playfair Display',serif; font-size:0.6rem; letter-spacing:0.35em; text-transform:uppercase; color:var(--red); margin-bottom:0.4rem; }
+.book-meta-item span { font-family:'IM Fell English',serif; font-size:1rem; color:var(--off-white); }
+
+.review-body { position:relative; }
+.review-lead { font-family:'Playfair Display',serif; font-size:clamp(1.4rem,3vw,1.9rem); font-style:italic; line-height:1.5; color:var(--off-white); margin-bottom:2.5rem; padding-left:1.5rem; border-left:2px solid var(--red); }
+.review-text { font-family:'Noto Serif SC',serif; font-size:1.05rem; line-height:2; color:rgba(245,240,232,0.75); margin-bottom:2rem; }
+.placeholder-text { color:rgba(245,240,232,0.2); font-style:italic; border:1px dashed rgba(200,16,46,0.2); border-radius:2px; padding:3rem 2rem; text-align:center; font-family:'IM Fell English',serif; font-size:1rem; letter-spacing:0.05em; }
+
+.pull-quote { position:relative; margin:4rem -2rem; padding:3rem 4rem; background:var(--red-dark); overflow:hidden; }
+.pull-quote::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(0,0,0,0.15) 10px,rgba(0,0,0,0.15) 11px); }
+.pull-quote blockquote { position:relative; font-family:'Playfair Display',serif; font-size:clamp(1.2rem,2.5vw,1.7rem); font-style:italic; line-height:1.5; color:var(--off-white); text-align:center; }
+.pull-quote cite { display:block; margin-top:1rem; font-family:'IM Fell English',serif; font-size:0.85rem; font-style:normal; letter-spacing:0.2em; color:rgba(245,240,232,0.6); text-align:center; }
+
+.rating-section { text-align:center; padding:4rem 0 2rem; }
+.rating-label { font-family:'Playfair Display',serif; font-size:0.65rem; letter-spacing:0.45em; text-transform:uppercase; color:var(--red); display:block; margin-bottom:1.2rem; }
+.rating-stars { display:flex; justify-content:center; gap:0.5rem; margin-bottom:1rem; }
+.star { width:28px; height:28px; fill:none; stroke:var(--red-dark); stroke-width:1.5; transition:fill 0.3s,stroke 0.3s,transform 0.3s; cursor:pointer; }
+.star.active { fill:var(--red); stroke:var(--red); }
+.star:hover  { transform:scale(1.2); }
+.rating-text { font-family:'IM Fell English',serif; font-size:0.9rem; font-style:italic; color:rgba(245,240,232,0.5); min-height:1.4em; transition:color 0.3s; }
+
+.tags { display:flex; flex-wrap:wrap; gap:0.6rem; margin-top:3rem; }
+.tag { font-family:'Playfair Display',serif; font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase; color:var(--red); border:1px solid rgba(200,16,46,0.4); padding:0.4rem 1rem; transition:background 0.2s,color 0.2s; }
+.tag:hover { background:var(--red); color:var(--off-white); }
+
+footer { position:relative; padding:4rem 2rem 3rem; text-align:center; border-top:1px solid rgba(200,16,46,0.15); margin-top:6rem; }
+footer::before { content:'ONE FOR SORROW'; position:absolute; top:-0.7em; left:50%; transform:translateX(-50%); background:var(--black); padding:0 1.5rem; font-family:'Playfair Display',serif; font-size:0.6rem; letter-spacing:0.45em; color:rgba(200,16,46,0.4); white-space:nowrap; }
+.footer-magpie-count { font-family:'Playfair Display',serif; font-size:0.7rem; letter-spacing:0.3em; color:rgba(245,240,232,0.25); margin-bottom:1rem; }
+.footer-sig { font-family:'IM Fell English',serif; font-style:italic; font-size:0.9rem; color:rgba(245,240,232,0.2); }
+
+.reveal { opacity:0; transform:translateY(28px); transition:opacity 0.9s ease,transform 0.9s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+.feather-accent { position:absolute; right:-40px; top:20%; opacity:0.04; transform:rotate(20deg); pointer-events:none; }
+.nursery-rhyme { font-family:'IM Fell English',serif; font-size:0.8rem; font-style:italic; line-height:2; color:rgba(245,240,232,0.18); text-align:right; padding:2rem 2rem 3rem 0; border-right:1px solid rgba(200,16,46,0.1); margin-top:5rem; }
+.nursery-rhyme strong { color:rgba(200,16,46,0.4); font-style:normal; }

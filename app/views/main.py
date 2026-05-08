@@ -75,6 +75,12 @@ def about():
                            heatmap_data=heatmap_data)
 
 
+@main.route('/magpie-murders')
+def magpie_murders():
+    return render_template('magpie_murders.html')
+
+
+
 @main.route('/books')
 def read_books():
     books = Book.query.filter_by(is_reading=False).order_by(Book.created_at.desc()).all()

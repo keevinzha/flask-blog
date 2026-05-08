@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>喜鹊谋杀案 — 读后感</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Noto+Serif+SC:wght@300;400;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/magpie_murders.css') }}">
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<section id="hero">
+
+  <!-- Title -->
+  <div class="title-wrap">
+    <span class="t-line t-line-1" id="titleLine1">MAGPIE</span>
+    <span class="t-line t-line-2" id="titleLine2">MURDERS</span>
+  </div>
+
+  <div class="hero-subtitle">
+    <span>读后感</span>
+    <span class="sub-dot">·</span>
+    <span>Anthony Horowitz</span>
+    <span class="sub-dot">·</span>
+    <span>2016</span>
+  </div>
+
+  <div class="scroll-hint">
+    <span>向下翻页</span>
+    <div class="scroll-line"></div>
+  </div>
+
+</section>
+
+<!-- ===== CONTENT ===== -->
+<main id="content">
+  <div class="container">
+
+    <div class="nursery-rhyme reveal" style="margin-top:5rem;">
+      <strong>One</strong> for sorrow,<br>
+      <strong>Two</strong> for joy,<br>
+      <strong>Three</strong> for a girl,<br>
+      <strong>Four</strong> for a boy,<br>
+      <strong>Five</strong> for silver,<br>
+      <strong>Six</strong> for gold,<br>
+      <strong>Seven</strong> for a secret,<br>
+      never to be told.
+    </div>
+
+    <div class="chapter-divider reveal">
+      <span class="chapter-num">第一章 · 基本信息</span>
+    </div>
+
+    <div class="book-card reveal">
+      <div class="book-meta">
+        <div class="book-meta-item"><label>作者</label><span>Anthony Horowitz</span></div>
+        <div class="book-meta-item"><label>原著出版</label><span>2016</span></div>
+        <div class="book-meta-item"><label>类型</label><span>推理 · 元小说</span></div>
+        <div class="book-meta-item"><label>改编剧集</label><span>BritBox · 2022</span></div>
+        <div class="book-meta-item"><label>阅读日期</label><span>待填写</span></div>
+        <div class="book-meta-item"><label>阅读版本</label><span>待填写</span></div>
+      </div>
+    </div>
+
+    <div class="chapter-divider reveal">
+      <span class="chapter-num">第二章 · 读后感</span>
+    </div>
+
+    <div class="review-body">
+      <svg class="feather-accent" width="200" height="500" viewBox="0 0 200 500">
+        <path d="M100,10 Q130,100 120,200 Q110,300 100,490 Q90,300 80,200 Q70,100 100,10Z" fill="#c8102e"/>
+        <path d="M100,50 Q150,120 140,220 M100,80 Q160,160 155,270 M100,50 Q50,120 60,220 M100,80 Q40,160 45,270" stroke="#c8102e" stroke-width="0.5" fill="none" opacity="0.5"/>
+      </svg>
+      <p class="review-lead reveal">待书读完后，在这里写下你的第一印象……</p>
+      <div class="review-text reveal">
+        <div class="placeholder-text">正文内容待填写。<br><br>读完后在这里留下你的思考、感受与分析。</div>
+      </div>
+    </div>
+
+    <div class="pull-quote reveal">
+      <blockquote>
+        "每一桩谋杀背后，都藏着一个讲故事的人。"
+        <cite>— 占位引言，读完后替换 —</cite>
+      </blockquote>
+    </div>
+
+    <div class="review-text reveal" style="margin-top:3rem;">
+      <div class="placeholder-text" style="min-height:200px;">第二部分内容……</div>
+    </div>
+
+    <div class="chapter-divider reveal">
+      <span class="chapter-num">第三章 · 评分与标签</span>
+    </div>
+
+    <div class="rating-section reveal">
+      <span class="rating-label">综合评分</span>
+      <div class="rating-stars" id="stars"></div>
+      <p class="rating-text" id="ratingText">点击星星评分</p>
+    </div>
+
+    <div class="tags reveal">
+      <span class="tag">推理小说</span>
+      <span class="tag">元叙事</span>
+      <span class="tag">英式谋杀</span>
+      <span class="tag">故事中的故事</span>
+      <span class="tag">阿加莎风格</span>
+      <span class="tag">BBC改编</span>
+    </div>
+
+  </div>
+
+  <footer>
+    <p class="footer-magpie-count">✦ &nbsp; ONE FOR SORROW &nbsp; ✦</p>
+    <p class="footer-sig">写于读完之后 · 喜鹊飞过的那个下午</p>
+  </footer>
+</main>
+
+<script src="{{ url_for('static', filename='js/magpie_murders.js') }}"></script>
+</body>
+</html>
