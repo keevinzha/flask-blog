@@ -315,7 +315,8 @@ def series_new():
             flash('该slug已存在，请换一个', 'error')
             return render_template('admin/series_form.html', series=None)
         s_theme = request.form.get('theme', '').strip() or None
-        s = Series(title=title, slug=slug, description=description, theme=s_theme)
+        is_recommended = bool(request.form.get('is_recommended'))
+        s = Series(title=title, slug=slug, description=description, theme=s_theme, is_recommended=is_recommended)
         db.session.add(s)
         db.session.commit()
         cache.clear()
@@ -338,6 +339,7 @@ def series_edit(series_id):
         series.slug = slug
         series.description = request.form.get('description', '').strip()
         series.theme = request.form.get('theme', '').strip() or None
+        series.is_recommended = bool(request.form.get('is_recommended'))
         db.session.commit()
         cache.clear()
         flash('专题已更新', 'success')
