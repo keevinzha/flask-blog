@@ -1,0 +1,234 @@
+/* ============================================================
+   ii_theme.css — 聪明的投资者 · 棕金主题（深色 + 浅色）
+   ============================================================ */
+
+/* ── 深色模式（默认 / data-theme="dark"）── */
+:root,
+[data-theme="dark"] {
+  --body-background:    #1c1008;
+  --body-font-color:    #e8d9b8;
+  --color-link:         #c9a84c;
+  --color-visited-link: #a87c30;
+  --gray-100:           #2a1a09;
+  --gray-200:           #3d2810;
+  --gray-500:           #7a5a30;
+  --icon-filter:        brightness(0.85) sepia(1) hue-rotate(5deg) saturate(0.8);
+
+  /* 主题专用 */
+  --ii-hero-grad:   linear-gradient(to bottom, transparent, #1c1008);
+  --ii-code-bg:     rgba(42,26,9,0.85);
+  --ii-code-border: rgba(201,168,76,0.12);
+  --ii-quote-bar:   rgba(201,168,76,0.4);
+  --ii-table-alt:   rgba(42,26,9,0.5);
+  --ii-table-bdr:   rgba(201,168,76,0.1);
+  --ii-hr:          rgba(201,168,76,0.12);
+  --ii-sidebar-bdr: rgba(201,168,76,0.1);
+  --ii-title-color: #e8c96a;
+  --ii-title-text-shadow:
+    0 0 60px rgba(201,168,76,0.25),
+    0 2px 12px rgba(0,0,0,0.7);
+}
+
+/* ── 浅色模式（data-theme="light" 或系统浅色）── */
+[data-theme="light"],
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --body-background:    #f8f0e2;
+    --body-font-color:    #2a1a08;
+    --color-link:         #7a4e1a;
+    --color-visited-link: #5a3810;
+    --gray-100:           #ede0c8;
+    --gray-200:           #d4c4a0;
+    --gray-500:           #8b6040;
+    --icon-filter:        sepia(0.4) brightness(0.85);
+
+    --ii-hero-grad:   linear-gradient(to bottom, transparent, #f8f0e2);
+    --ii-code-bg:     rgba(220,200,160,0.5);
+    --ii-code-border: rgba(120,78,25,0.2);
+    --ii-quote-bar:   rgba(120,78,25,0.4);
+    --ii-table-alt:   rgba(220,200,160,0.4);
+    --ii-table-bdr:   rgba(120,78,25,0.12);
+    --ii-hr:          rgba(120,78,25,0.15);
+    --ii-sidebar-bdr: rgba(120,78,25,0.12);
+    --ii-title-color: #6b3d10;
+    --ii-title-text-shadow:
+      0 0 40px rgba(120,78,25,0.15),
+      0 2px 8px rgba(0,0,0,0.15);
+  }
+}
+
+[data-theme="light"] {
+  --body-background:    #f8f0e2;
+  --body-font-color:    #2a1a08;
+  --color-link:         #7a4e1a;
+  --color-visited-link: #5a3810;
+  --gray-100:           #ede0c8;
+  --gray-200:           #d4c4a0;
+  --gray-500:           #8b6040;
+  --icon-filter:        sepia(0.4) brightness(0.85);
+
+  --ii-hero-grad:   linear-gradient(to bottom, transparent, #f8f0e2);
+  --ii-code-bg:     rgba(220,200,160,0.5);
+  --ii-code-border: rgba(120,78,25,0.2);
+  --ii-quote-bar:   rgba(120,78,25,0.4);
+  --ii-table-alt:   rgba(220,200,160,0.4);
+  --ii-table-bdr:   rgba(120,78,25,0.12);
+  --ii-hr:          rgba(120,78,25,0.15);
+  --ii-sidebar-bdr: rgba(120,78,25,0.12);
+  --ii-title-color: #6b3d10;
+  --ii-title-text-shadow:
+    0 0 40px rgba(120,78,25,0.15),
+    0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* ── 全局背景 ── */
+body {
+  background: var(--body-background) !important;
+}
+
+/* ── 股票数字背景 canvas ── */
+#ii-bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ── Hero 标题区 ── */
+.ii-hero {
+  margin: -1rem -1rem 3rem -1rem;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.ii-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 140px;
+  background: var(--ii-hero-grad);
+  pointer-events: none;
+}
+
+.ii-hero-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.ii-title-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ii-title {
+  font-family: 'Noto Serif SC', 'Source Han Serif CN', serif;
+  font-size: clamp(1.4rem, 3.8vw, 3rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.25;
+  color: var(--ii-title-color);
+  text-shadow: var(--ii-title-text-shadow);
+  white-space: nowrap;
+}
+
+.ii-title-rule {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-link), transparent);
+  opacity: 0.6;
+}
+
+.ii-subtitle {
+  font-family: 'EB Garamond', 'Georgia', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  color: var(--body-font-color);
+  opacity: 0.45;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.ii-subtitle a {
+  color: var(--color-link);
+  text-decoration: none;
+  opacity: 0.8;
+}
+.ii-subtitle a:hover { opacity: 1; }
+.ii-dot { opacity: 0.35; }
+
+/* ── 滚动提示 ── */
+.ii-scroll-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  animation: ii-fade-in 1s 1.5s both;
+  cursor: pointer;
+  user-select: none;
+}
+.ii-scroll-hint span {
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--body-font-color);
+  opacity: 0.25;
+}
+.ii-scroll-line {
+  width: 1px;
+  height: 36px;
+  background: linear-gradient(to bottom, var(--color-link), transparent);
+  opacity: 0.5;
+  animation: ii-pulse 2.2s ease infinite;
+}
+@keyframes ii-pulse {
+  0%, 100% { opacity: 0.5; transform: scaleY(1); }
+  50%       { opacity: 0.1; transform: scaleY(0.5); }
+}
+@keyframes ii-fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 侧边栏边框 ── */
+.book-menu { border-right-color: var(--ii-sidebar-bdr) !important; }
+.book-toc  { border-left-color:  var(--ii-sidebar-bdr) !important; }
+.book-menu a.active { color: var(--color-link) !important; }
+
+/* ── 代码块 ── */
+.markdown pre,
+.markdown code {
+  background:   var(--ii-code-bg)     !important;
+  border-color: var(--ii-code-border) !important;
+}
+
+/* ── 引用块 ── */
+.markdown blockquote {
+  border-inline-start-color: var(--ii-quote-bar) !important;
+}
+
+/* ── 表格 ── */
+.markdown table tr:nth-child(2n) { background:    var(--ii-table-alt) !important; }
+.markdown table th,
+.markdown table td               { border-color:  var(--ii-table-bdr) !important; }
+
+/* ── 分割线 ── */
+.markdown hr { border-color: var(--ii-hr) !important; }
+
+/* ── footer ── */
+.book-footer { border-top-color: var(--ii-sidebar-bdr) !important; }

@@ -18,10 +18,18 @@ main = Blueprint('main', __name__)
 @main.route('/')
 @cache.cached(timeout=300)
 def index():
-    recent = Article.query.filter_by(
+    recommended = Article.query.filter_by(
         is_published=True,
         is_recommended=True
-    ).order_by(Article.created_at.desc()).limit(10).all()
+    ).all()
+    all_series = Series.query.filter_by(is_recommended=True).all()
+
+    items = sorted(
+        [(a.created_at, a) for a in recommended] + [(s.created_at, s) for s in all_series],
+        key=lambda x: x[0],
+        reverse=True
+    )
+    recent = [obj for _, obj in items][:10]
 
     categories = Category.query.all()
     tags = Tag.query.all()

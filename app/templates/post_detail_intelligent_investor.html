@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} – {{ site_title }}{% endblock %}
+{% block description %}{{ post.summary | default(post.title, true) | striptags }}{% endblock %}
+{% block header_title %}{{ post.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ii_theme.css') }}">
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css">
+{% endblock %}
+
+{# ── 右侧栏：TOC + 专题导航 + 标签 + 分类 ── #}
+{% block toc %}
+
+{% if toc_html %}
+{{ toc_html | safe }}
+{% endif %}
+
+{% if post.series %}
+<nav>
+  <ul>
+    <li class="book-section-flat">
+      <span>{{ post.series.title }}</span>
+      <ul>
+        {% for article in post.series.articles %}
+        <li class="flex align-center {% if article.id == post.id %}active{% endif %}">
+          <a href="{{ url_for('blog.article_detail', slug=article.slug) }}"
+             {% if article.id == post.id %}style="font-weight:600;color:var(--color-link)"{% endif %}>
+            {{ article.title }}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
+  </ul>
+</nav>
+{% endif %}
+
+{% if all_tags %}
+<nav>
+  <ul>
+    <li class="book-section-flat">
+      <span>标签</span>
+      <ul>
+        {% for tag in all_tags %}
+        <li class="flex align-center">
+          <a href="{{ url_for('blog.tag', slug=tag.slug) }}">{{ tag.name }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
+  </ul>
+</nav>
+{% endif %}
+
+{% if all_categories %}
+<nav>
+  <ul>
+    <li class="book-section-flat">
+      <span>分类</span>
+      <ul>
+        {% for cat in all_categories %}
+        <li class="flex align-center">
+          <a href="{{ url_for('blog.category', slug=cat.slug) }}">{{ cat.name }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
+  </ul>
+</nav>
+{% endif %}
+
+{% endblock %}
+
+{% block content %}
+
+{# ── 全页股票数字背景 canvas ── #}
+<canvas id="ii-bg-canvas"></canvas>
+
+{# ── 满屏标题 Hero ── #}
+<div class="ii-hero">
+  <div class="ii-hero-inner">
+    <div class="ii-title-wrap">
+      <span class="ii-title">{{ post.title }}</span>
+      <div class="ii-title-rule"></div>
+      <span class="ii-subtitle">
+        {% if post.created_at %}{{ post.created_at.strftime('%Y · %m · %d') }}{% endif %}
+        {% if post.category %}
+          <span class="ii-dot">·</span>
+          <a href="{{ url_for('blog.category', slug=post.category.slug) }}">{{ post.category.name }}</a>
+        {% endif %}
+        <span class="ii-dot">·</span>
+        <span>{{ post.view_count }} 次阅读</span>
+      </span>
+    </div>
+    <div class="ii-scroll-hint" id="ii-scroll-hint" role="button" tabindex="0" aria-label="滚动到正文">
+      <span>向下阅读</span>
+      <div class="ii-scroll-line"></div>
+    </div>
+  </div>
+</div>
+
+{# ── 正文（与 post_detail 一致）── #}
+<article class="markdown book-post" id="ii-article-start">
+  <h1>{{ post.title }}</h1>
+
+  <div>
+    <div class="flex align-center gap text-small">
+      {% if post.created_at %}
+      <div class="flex align-center book-post-date">
+        <svg class="book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8"  y1="2" x2="8"  y2="6"/>
+          <line x1="3"  y1="10" x2="21" y2="10"/>
+        </svg>
+        <span>{{ post.created_at.strftime('%Y-%m-%d') }}</span>
+      </div>
+      {% endif %}
+      <div class="flex align-center">
+        <svg class="book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <span>{{ post.view_count }}</span>
+      </div>
+    </div>
+
+    {% if post.tags %}
+    <div class="text-small">
+      {% for tag in post.tags %}
+        {% if not loop.first %}, {% endif %}
+        <a href="{{ url_for('blog.tag', slug=tag.slug) }}">{{ tag.name }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if post.category %}
+    <div class="text-small">
+      <a href="{{ url_for('blog.category', slug=post.category.slug) }}">{{ post.category.name }}</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="book-post-content markdown-inner">
+    {{ content_html | safe }}
+  </div>
+</article>
+
+<div id="waline" style="margin-top:2rem"></div>
+{% endblock %}
+
+{% block footer %}
+{% if prev_post or next_post %}
+<div class="flex flex-wrap justify-between">
+  <span>
+    {% if prev_post %}
+    <a href="{{ url_for('blog.article_detail', slug=prev_post.slug) }}" class="flex align-center">
+      <svg class="book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      <span>{{ prev_post.title }}</span>
+    </a>
+    {% endif %}
+  </span>
+  <span>
+    {% if next_post %}
+    <a href="{{ url_for('blog.article_detail', slug=next_post.slug) }}" class="flex align-center">
+      <span>{{ next_post.title }}</span>
+      <svg class="book-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </a>
+    {% endif %}
+  </span>
+</div>
+{% endif %}
+{{ super() }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/ii_theme.js') }}"></script>
+<script type="module">
+  import { init } from 'https://unpkg.com/@waline/client@v3/dist/waline.js';
+  init({
+    el: '#waline',
+    serverURL: 'https://comments.keevinzha.com',
+    lang: 'zh-CN',
+    dark: 'auto',
+  });
+</script>
+{% endblock %}

@@ -17,6 +17,7 @@ class Series(db.Model):
     cover = db.Column(db.String(256))
     theme = db.Column(db.String(64), nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
+    is_recommended = db.Column(db.Boolean, default=False)
 
     articles = db.relationship('Article', backref='series', lazy='dynamic',
                                order_by='Article.series_order')
