@@ -183,7 +183,7 @@ def _save_article(article):
 
     article.tags = tags
     db.session.flush()  # 确保 article.id 已生成（新文章）
-    ArticleActivity.record(article.id)
+    ArticleActivity.record_edit(article.id)
     db.session.commit()
     cache.clear()
     flash('文章已保存', 'success')

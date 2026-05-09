@@ -10,7 +10,7 @@ from app.models import Article, Category, Tag, Series
 from app import db, cache
 from app.models.about import Book, Project
 from app.models.article_activity import ArticleActivity
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 
 main = Blueprint('main', __name__)
 
@@ -68,12 +68,15 @@ def about():
     one_year_ago = date.today() - timedelta(days=365)
     activities = db.session.query(
         ArticleActivity.date,
-        db.func.count(ArticleActivity.article_id)
+        db.func.sum(ArticleActivity.edit_count)
     ).join(Article, Article.id == ArticleActivity.article_id)\
-     .filter(Article.is_published == True, ArticleActivity.date >= one_year_ago)\
-     .group_by(ArticleActivity.date).all()
+     .filter(
+         Article.is_published == True,
+         ArticleActivity.date >= one_year_ago,
+         ArticleActivity.edit_count > 0
+     ).group_by(ArticleActivity.date).all()
 
-    heatmap_data = {str(d): cnt for d, cnt in activities}
+    heatmap_data = {str(d): int(cnt) for d, cnt in activities}
 
     return render_template('about.html',
                            books=books,
