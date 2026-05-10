@@ -172,3 +172,15 @@ def sitemap():
     xml_lines.append('</urlset>')
 
     return Response('\n'.join(xml_lines), mimetype='application/xml')
+
+
+@main.route('/robots.txt')
+def robots():
+    base = request.host_url.rstrip('/')
+    content = f"""User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: {base}/sitemap.xml
+"""
+    return Response(content, mimetype='text/plain')
