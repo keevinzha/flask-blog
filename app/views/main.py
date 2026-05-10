@@ -5,7 +5,7 @@
 @File ：main.py
 @IDE ：PyCharm
 """
-from flask import Blueprint, render_template, jsonify, url_for
+from flask import Blueprint, render_template, jsonify, url_for, request, Response
 from app.models import Article, Category, Tag, Series
 from app import db, cache
 from app.models.about import Book, Project
@@ -96,3 +96,79 @@ def magpie_murders():
 def read_books():
     books = Book.query.filter_by(is_reading=False).order_by(Book.created_at.desc()).all()
     return render_template('read_books.html', books=books)
+
+
+@main.route('/sitemap.xml')
+def sitemap():
+    base = request.host_url.rstrip('/')
+
+    urls = []
+
+    # 静态页面
+    static_pages = [
+        ('/', '1.0', 'daily'),
+        ('/blog', '0.9', 'daily'),
+        ('/about', '0.8', 'monthly'),
+        ('/books', '0.7', 'monthly'),
+    ]
+    for path, priority, changefreq in static_pages:
+        urls.append({
+            'loc': base + path,
+            'priority': priority,
+            'changefreq': changefreq,
+            'lastmod': None,
+        })
+
+    # 已发布文章
+    articles = Article.query.filter_by(is_published=True).order_by(Article.updated_at.desc()).all()
+    for article in articles:
+        urls.append({
+            'loc': base + url_for('blog.article_detail', slug=article.slug),
+            'priority': '0.8',
+            'changefreq': 'weekly',
+            'lastmod': article.updated_at.strftime('%Y-%m-%d') if article.updated_at else None,
+        })
+
+    # 分类页面
+    categories = Category.query.all()
+    for cat in categories:
+        urls.append({
+            'loc': base + url_for('blog.category', slug=cat.slug),
+            'priority': '0.6',
+            'changefreq': 'weekly',
+            'lastmod': None,
+        })
+
+    # 标签页面
+    tags = Tag.query.all()
+    for tag in tags:
+        urls.append({
+            'loc': base + url_for('blog.tag', slug=tag.slug),
+            'priority': '0.5',
+            'changefreq': 'weekly',
+            'lastmod': None,
+        })
+
+    # 系列页面
+    all_series = Series.query.all()
+    for s in all_series:
+        urls.append({
+            'loc': base + url_for('blog.series', slug=s.slug),
+            'priority': '0.7',
+            'changefreq': 'weekly',
+            'lastmod': s.created_at.strftime('%Y-%m-%d') if s.created_at else None,
+        })
+
+    xml_lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for u in urls:
+        xml_lines.append('  <url>')
+        xml_lines.append(f'    <loc>{u["loc"]}</loc>')
+        if u['lastmod']:
+            xml_lines.append(f'    <lastmod>{u["lastmod"]}</lastmod>')
+        xml_lines.append(f'    <changefreq>{u["changefreq"]}</changefreq>')
+        xml_lines.append(f'    <priority>{u["priority"]}</priority>')
+        xml_lines.append('  </url>')
+    xml_lines.append('</urlset>')
+
+    return Response('\n'.join(xml_lines), mimetype='application/xml')
