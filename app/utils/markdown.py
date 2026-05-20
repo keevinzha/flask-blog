@@ -68,6 +68,7 @@ def render_markdown(content):
         TocExtension(baselevel=2),
         'fenced_code',
         'tables',
+        'mdx_truly_sane_lists',
         CodeHiliteExtension(linenums=False, css_class='highlight', guess_lang=False),
         MathProtectExtension(),
     ])
