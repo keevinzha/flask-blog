@@ -7,10 +7,12 @@
 """
 from flask import Blueprint, render_template, jsonify, url_for, request, Response
 from app.models import Article, Category, Tag, Series
+from app.models.deep_work import build_weeks_json
 from app import db, cache
 from app.models.about import Book, Project
 from app.models.article_activity import ArticleActivity
 from datetime import timedelta, date
+import json
 
 main = Blueprint('main', __name__)
 
@@ -172,6 +174,15 @@ def sitemap():
     xml_lines.append('</urlset>')
 
     return Response('\n'.join(xml_lines), mimetype='application/xml')
+
+
+@main.route('/deep-work')
+def deep_work():
+    today = date.today()
+    weeks = build_weeks_json(year=today.year, num_weeks=4)
+    return render_template('deep_work_table.html',
+                           weeks_json=json.dumps(weeks),
+                           now=today)
 
 
 @main.route('/robots.txt')

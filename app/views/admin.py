@@ -6,12 +6,15 @@
 @IDE ：PyCharm
 """
 import os
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+import json
+from datetime import date
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from app import db, cache
 from app.models import User, Article, Category, Tag, Series
 from app.models.article_activity import ArticleActivity
 from app.models.about import Book, Project
+from app.models.deep_work import DeepWorkSession, build_weeks_json
 from slugify import slugify
 
 admin = Blueprint('admin', __name__)
@@ -465,4 +468,83 @@ def project_delete(project_id):
     return redirect(url_for('admin.projects'))
 
 
+@admin.route('/deep-work')
+@login_required
+def deep_work():
+    today = date.today()
+    weeks = build_weeks_json(year=today.year)
+    return render_template('admin/deep_work_table_admin.html',
+                           weeks_json=json.dumps(weeks))
 
+
+@admin.route('/deep-work/api', methods=['POST'])
+@login_required
+def deep_work_api():
+    data = request.get_json(force=True)
+    action = data.get('action')
+    today = date.today()
+
+    if action in ('add', 'add_bt'):
+        session = data.get('session', {})
+        s = DeepWorkSession(
+            session_date=today,
+            is_breakthrough=(action == 'add_bt'),
+            seed=int(session.get('seed', 0)),
+        )
+        db.session.add(s)
+        db.session.commit()
+        return jsonify({'ok': True, 'id': s.id})
+
+    if action in ('remove', 'remove_bt'):
+        week_idx = data.get('week_idx')
+        tick_idx = data.get('tick_idx')
+        if week_idx is None or tick_idx is None:
+            return jsonify({'ok': False, 'error': 'missing indices'}), 400
+
+        # Rebuild week list to resolve indices to a DB row
+        weeks = build_weeks_json(year=today.year)
+        if week_idx >= len(weeks):
+            return jsonify({'ok': False, 'error': 'week_idx out of range'}), 400
+
+        week_sessions_in_db = (
+            DeepWorkSession.query
+            .filter(db.func.year(DeepWorkSession.session_date) == today.year)
+            .order_by(DeepWorkSession.session_date, DeepWorkSession.id)
+            .all()
+        )
+
+        # Rebuild the same grouping to find the right row
+        from collections import defaultdict
+        grouped: dict = defaultdict(list)
+        for s in week_sessions_in_db:
+            iso = s.session_date.isocalendar()
+            grouped[(iso[0], iso[1])].append(s)
+
+        sorted_keys = sorted(grouped.keys())
+        # Ensure current week key exists (matches build_weeks_json)
+        current_iso = today.isocalendar()
+        current_key = (current_iso[0], current_iso[1])
+        if current_key not in grouped:
+            grouped[current_key] = []
+            sorted_keys = sorted(grouped.keys())
+
+        if week_idx >= len(sorted_keys):
+            return jsonify({'ok': False, 'error': 'week_idx out of range'}), 400
+
+        target_key = sorted_keys[week_idx]
+        target_sessions = grouped[target_key]
+
+        if tick_idx >= len(target_sessions):
+            return jsonify({'ok': False, 'error': 'tick_idx out of range'}), 400
+
+        target = target_sessions[tick_idx]
+
+        if action == 'remove':
+            db.session.delete(target)
+        else:  # remove_bt
+            target.is_breakthrough = False
+
+        db.session.commit()
+        return jsonify({'ok': True})
+
+    return jsonify({'ok': False, 'error': 'unknown action'}), 400

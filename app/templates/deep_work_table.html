@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}深度工作 – {{ site_title }}{% endblock %}
+{% block description %}深度工作计分板{% endblock %}
+{% block header_title %}深度工作{% endblock %}
+{% block show_toc_icon %}{% endblock %}
+{% block toc %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/deep_work_table.css') }}">
+<style>
+.scoreboard { border-radius: 0; border-left: none; border-right: none; max-width: 100%; border-top: none; border-bottom: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="page-header">
+  <div>
+    <h1>深度工作</h1>
+    <div class="subtitle">DEEP WORK SCOREBOARD · {{ now.year }}</div>
+  </div>
+</header>
+
+<div class="stats-row">
+  <div class="stat">
+    <div class="stat-value" id="stat-total">—</div>
+    <div class="stat-label">今年累计</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value" id="stat-month">—</div>
+    <div class="stat-label">本月</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value" id="stat-week">—</div>
+    <div class="stat-label">本周</div>
+  </div>
+  <div class="stat stat-breakthrough">
+    <div class="stat-value" id="stat-bt">—</div>
+    <div class="stat-label">突破平均间隔</div>
+  </div>
+</div>
+
+<div class="scoreboard" id="scoreboard"></div>
+
+<div class="legend">
+  <div class="legend-item">
+    <svg class="legend-svg" id="legend-normal" width="16" height="32"></svg>
+    <span>深度工作时间块</span>
+  </div>
+  <div class="legend-item">
+    <svg class="legend-svg" id="legend-bt" width="24" height="32"></svg>
+    <span>重大突破</span>
+  </div>
+</div>
+
+<div class="page-note">每条竖线代表一个深度工作时间块 · 圆圈标记重大突破</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<script>
+const DEEP_WORK_WEEKS = {{ weeks_json | safe }};
+</script>
+<script src="{{ url_for('static', filename='js/deep_work_table.js') }}"></script>
+<script>
+dwRenderFront(DEEP_WORK_WEEKS);
+dwRenderStats(DEEP_WORK_WEEKS);
+dwRenderLegend();
+dwOnThemeChange(() => {
+  dwRenderFront(DEEP_WORK_WEEKS);
+  dwRenderLegend();
+});
+</script>
+{% endblock %}

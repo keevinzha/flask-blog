@@ -1,0 +1,105 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}深度工作 – {{ site_title }}{% endblock %}
+{% block header_title %}深度工作计分板{% endblock %}
+{% block toc %}{% endblock %}
+{% block show_toc_icon %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/deep_work_table.css') }}">
+{% endblock %}
+
+{% block content %}
+<div id="scoreboard"></div>
+
+<div class="btn-area" style="margin-top:2rem">
+  <div class="today-badge" id="today-badge">今天</div>
+  <div class="btn-3d-wrap">
+    <div class="btn-base"></div>
+    <button class="btn-top" id="main-btn" aria-label="记录深度工作时间块"></button>
+  </div>
+  <div class="btn-hint">
+    点击记录一个深度工作时间块
+    <span>长按 3 秒 → 重大突破</span>
+  </div>
+  <div class="feedback" id="feedback"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<script src="{{ url_for('static', filename='js/deep_work_table.js') }}"></script>
+<script>
+const fmt = d => d.getFullYear().toString().slice(2) + '/' +
+  String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+
+document.getElementById('today-badge').textContent = fmt(new Date());
+
+// 从后端注入数据，格式：[{label, current, sessions:[{bt, seed}]}]
+const WEEKS = {{ weeks_json | safe }};
+
+let editingIdx = null;
+
+function newSession(bt) {
+  return { bt, seed: Math.floor(Math.random() * 99999) };
+}
+
+function rerender() {
+  dwRenderAdmin(WEEKS, editingIdx,
+    (wi) => {
+      if (editingIdx === wi) return;
+      editingIdx = wi;
+      rerender();
+    },
+    (wi, ti, isBt) => {
+      if (isBt) {
+        WEEKS[wi].sessions[ti].bt = false;
+      } else {
+        WEEKS[wi].sessions.splice(ti, 1);
+      }
+      // POST到后端
+      saveToServer(wi, ti, isBt ? 'remove_bt' : 'remove');
+      rerender();
+      editingIdx = wi;
+      document.querySelectorAll('.week-row')[wi]?.classList.add('editing');
+    }
+  );
+}
+
+document.addEventListener('click', (e) => {
+  if (editingIdx === null) return;
+  if (!e.target.closest('.week-row')) { editingIdx = null; rerender(); }
+});
+
+rerender();
+dwOnThemeChange(() => rerender());
+
+dwInitButton((bt) => {
+  const session = newSession(bt);
+  WEEKS[WEEKS.length-1].sessions.push(session);
+  rerender();
+
+  const fb = document.getElementById('feedback');
+  fb.textContent = bt ? '🎯 重大突破！' : '+1';
+  fb.className = 'feedback show' + (bt ? ' breakthrough' : '');
+  setTimeout(() => { fb.className = 'feedback'; }, bt ? 3000 : 1500);
+
+  if (bt) {
+    confetti({ particleCount:120, spread:80, origin:{y:0.6},
+      colors:['#c0392b','#e74c3c','#f4a261','#2c4a3e','#f5f3ee'] });
+    setTimeout(() => confetti({ particleCount:60, spread:100, origin:{y:0.5} }), 400);
+  }
+
+  // POST到后端
+  saveToServer(null, null, bt ? 'add_bt' : 'add', session);
+});
+
+function saveToServer(wi, ti, action, session) {
+  fetch('{{ url_for("admin.deep_work_api") }}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token() }}' },
+    body: JSON.stringify({ action, week_idx: wi, tick_idx: ti, session })
+  });
+}
+</script>
+{% endblock %}
